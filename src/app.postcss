@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+html,
+body {
+	@apply h-full overflow-hidden;
+}
+
+/* Estilos personalizados */
+.table-interactive {
+	@apply cursor-pointer hover:bg-surface-hover;
+}
+
+.card-hover {
+	@apply transition-all duration-200 hover:scale-105 hover:shadow-xl;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	@apply bg-surface-200-700-token;
+}
+
+::-webkit-scrollbar-thumb {
+	@apply bg-surface-400-500-token rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	@apply bg-surface-500-400-token;
+}
+
+/* Animaciones */
+@keyframes slide-in {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+.slide-in {
+	animation: slide-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.fade-in {
+	animation: fade-in 0.2s ease-out;
+}
+
+/* Estilos para el POS */
+.mesa-card {
+	@apply aspect-square flex flex-col items-center justify-center rounded-lg p-4 cursor-pointer transition-all duration-200;
+}
+
+.mesa-available {
+	@apply bg-success-500 hover:bg-success-600 text-white;
+}
+
+.mesa-occupied {
+	@apply bg-error-500 hover:bg-error-600 text-white;
+}
+
+.mesa-reserved {
+	@apply bg-warning-500 hover:bg-warning-600 text-white;
+}
+
+/* Estilos de impresión */
+@media print {
+	.no-print {
+		display: none !important;
+	}
+}
