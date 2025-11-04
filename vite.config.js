@@ -6,9 +6,15 @@ export default defineConfig({
 	plugins: [sveltekit(), purgeCss()],
 	server: {
 		port: 5173,
+		host: '0.0.0.0',
+		strictPort: true,
+		hmr: {
+			clientPort: 443,
+			protocol: 'wss'
+		},
 		proxy: {
 			'/api': {
-				target: 'http://localhost:8000', // API Gateway
+				target: 'http://nginx', // API Gateway interno
 				changeOrigin: true
 			}
 		}
