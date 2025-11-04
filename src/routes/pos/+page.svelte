@@ -16,6 +16,7 @@
 	import MoreVertical from '$lib/components/icons/MoreVertical.svelte';
 	import Armchair from '$lib/components/icons/Armchair.svelte';
 	import Loader from '$lib/components/icons/Loader.svelte';
+	import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
 
 	let zones = [];
 	let tables = [];
@@ -349,8 +350,9 @@
 		<div class="col-span-4 bg-sidebar flex flex-col h-full">
 			<!-- Header -->
 			<div class="p-4 border-b border-border">
-				<button class="btn btn-sm variant-ghost-surface mb-4" on:click={backToTables}>
-					◀ Volver a Mesas
+				<button class="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-lg transition-colors text-sm font-medium mb-4" on:click={backToTables}>
+					<ArrowLeft class="h-4 w-4" />
+					Volver a Mesas
 				</button>
 				<h3 class="h3">Mesa {currentTable?.numero || ''}</h3>
 				<p class="text-sm text-muted-foreground">
