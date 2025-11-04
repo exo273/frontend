@@ -414,51 +414,53 @@
 	</div>
 {/if}
 
-<!-- Modal de Pago -->
-<Modal bind:show={showPaymentModal} title="Procesar Pago" size="md">
+<!-- Dialog de Pago -->
+<Dialog bind:open={showPaymentModal}>
+	<h2 slot="header" class="text-xl font-bold">Procesar Pago</h2>
+	
 	<form on:submit|preventDefault={processPayment} class="space-y-4">
-		<div class="card variant-ghost-surface p-4">
+		<div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
 			<p class="text-2xl font-bold text-center">
 				Total: S/ {getOrderTotal().toFixed(2)}
 			</p>
 		</div>
 
-		<label class="label">
-			<span>Método de Pago *</span>
-			<select bind:value={paymentData.metodo} required class="select">
-				<option value="efectivo">💵 Efectivo</option>
-				<option value="tarjeta">💳 Tarjeta</option>
-				<option value="yape">📱 Yape / Plin</option>
+		<label class="block">
+			<span class="text-sm font-medium mb-1 block">Método de Pago *</span>
+			<select bind:value={paymentData.metodo} required class="w-full px-3 py-2 border rounded-lg">
+				<option value="efectivo">Efectivo</option>
+				<option value="tarjeta">Tarjeta</option>
+				<option value="yape">Yape / Plin</option>
 			</select>
 		</label>
 
-		<label class="label">
-			<span>Monto Recibido *</span>
+		<label class="block">
+			<span class="text-sm font-medium mb-1 block">Monto Recibido *</span>
 			<input
 				type="number"
 				bind:value={paymentData.monto}
 				step="0.01"
 				min={getOrderTotal()}
 				required
-				class="input"
+				class="w-full px-3 py-2 border rounded-lg"
 			/>
 		</label>
 
 		{#if paymentData.monto > getOrderTotal()}
-			<div class="card variant-ghost-success p-4">
-				<p class="font-semibold">
-					💰 Vuelto: S/ {(paymentData.monto - getOrderTotal()).toFixed(2)}
+			<div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+				<p class="font-semibold text-green-800 dark:text-green-200">
+					Vuelto: S/ {(paymentData.monto - getOrderTotal()).toFixed(2)}
 				</p>
 			</div>
 		{/if}
 
 		{#if paymentData.metodo !== 'efectivo'}
-			<label class="label">
-				<span>Referencia / N° de Operación</span>
+			<label class="block">
+				<span class="text-sm font-medium mb-1 block">Referencia / N° de Operación</span>
 				<input
 					type="text"
 					bind:value={paymentData.referencia}
-					class="input"
+					class="w-full px-3 py-2 border rounded-lg"
 					placeholder="Opcional"
 				/>
 			</label>
@@ -466,16 +468,12 @@
 	</form>
 
 	<div slot="footer" class="flex justify-end gap-2">
-		<button
-			type="button"
-			class="btn variant-ghost-surface"
-			on:click={() => (showPaymentModal = false)}
-		>
+		<Button variant="outline" on:click={() => (showPaymentModal = false)}>
 			Cancelar
-		</button>
-		<button type="button" class="btn variant-filled-success" on:click={processPayment}>
-			✅ Confirmar Pago
-		</button>
+		</Button>
+		<Button variant="default" on:click={processPayment}>
+			Confirmar Pago
+		</Button>
 	</div>
-</Modal>
+</Dialog>
 
