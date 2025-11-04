@@ -11,6 +11,9 @@
 	import Edit2 from '$lib/components/icons/Edit2.svelte';
 	import Check from '$lib/components/icons/Check.svelte';
 	import X from '$lib/components/icons/X.svelte';
+	import Trash2 from '$lib/components/icons/Trash2.svelte';
+	import CreditCard from '$lib/components/icons/CreditCard.svelte';
+	import MoreVertical from '$lib/components/icons/MoreVertical.svelte';
 
 	let zones = [];
 	let tables = [];
@@ -325,8 +328,8 @@
 							{#if item.imagen_url}
 								<img src={item.imagen_url} alt={item.nombre} class="w-full h-32 object-cover rounded mb-2" />
 							{:else}
-								<div class="w-full h-32 bg-muted rounded mb-2 flex items-center justify-center text-4xl">
-									🍽️
+								<div class="w-full h-32 bg-muted rounded mb-2 flex items-center justify-center">
+									<MoreVertical class="w-12 h-12 text-muted-foreground" />
 								</div>
 							{/if}
 							<h4 class="font-semibold mb-1">{item.nombre}</h4>
@@ -370,17 +373,17 @@
 										{item.cantidad} x S/ {item.precio_unitario.toFixed(2)}
 									</p>
 								</div>
-								<div class="flex items-center gap-2">
-									<p class="font-bold">S/ {item.subtotal.toFixed(2)}</p>
-									{#if !currentOrder}
-										<button
-											class="btn btn-sm variant-ghost-error"
-											on:click={() => removeOrderItem(index)}
-										>
-											🗑️
-										</button>
-									{/if}
-								</div>
+							<div class="flex items-center gap-2">
+								<p class="font-bold">S/ {item.subtotal.toFixed(2)}</p>
+								{#if !currentOrder}
+									<button
+										class="btn btn-sm variant-ghost-error"
+										on:click={() => removeOrderItem(index)}
+									>
+										<Trash2 class="w-4 h-4" />
+									</button>
+								{/if}
+							</div>
 							</div>
 						{/each}
 					</div>
@@ -397,15 +400,17 @@
 				<div class="space-y-2">
 					{#if !currentOrder}
 						<button
-							class="btn variant-filled-primary w-full"
+							class="btn variant-filled-primary w-full flex items-center justify-center gap-2"
 							on:click={createOrder}
 							disabled={orderItems.length === 0}
 						>
-							✅ Crear Orden
+							<Check class="w-5 h-5" />
+							Crear Orden
 						</button>
 					{:else}
-						<button class="btn variant-filled-success w-full" on:click={openPaymentModal}>
-							💳 Procesar Pago
+						<button class="btn variant-filled-success w-full flex items-center justify-center gap-2" on:click={openPaymentModal}>
+							<CreditCard class="w-5 h-5" />
+							Procesar Pago
 						</button>
 					{/if}
 				</div>
