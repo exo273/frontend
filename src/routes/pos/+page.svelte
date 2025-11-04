@@ -21,6 +21,8 @@
 	let selectedTable = null;
 	let showOrderModal = false;
 	let showEditTableModal = false;
+	let searchQuery = '';
+	let selectedCategory = '';
 
 	// Order state
 	let orderItems = [];
