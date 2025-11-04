@@ -227,18 +227,19 @@ export const apiService = {
 	updateMenuCategory: (id, data) => posClient.patch(`/api/pos/menu/categories/${id}/`, data),
 	deleteMenuCategory: (id) => posClient.delete(`/api/pos/menu/categories/${id}/`),
 
-	// Mesas y Zonas
-	getZones: () => operacionesClient.get('/api/operaciones/zonas/'),
-	getTables: (params) => operacionesClient.get('/api/operaciones/mesas/', params),
-	updateTableStatus: (id, status) => operacionesClient.post(`/api/operaciones/mesas/${id}/update_status/`, { status }),
-	getTablesSummary: () => operacionesClient.get('/api/operaciones/mesas/status_summary/'),
+	// Mesas y Zonas (POS)
+	getZones: () => posClient.get('/api/pos/zones/'),
+	getTables: (params) => posClient.get('/api/pos/tables/', params),
+	updateTable: (id, data) => posClient.patch(`/api/pos/tables/${id}/`, data),
+	updateTableStatus: (id, status) => posClient.post(`/api/pos/tables/${id}/update_status/`, { status }),
+	getTablesSummary: () => posClient.get('/api/pos/tables/status_summary/'),
 
-	// Órdenes
-	getOrders: (params) => operacionesClient.get('/api/orders/orders/', params),
-	createOrder: (data) => operacionesClient.post('/api/orders/orders/', data),
-	updateOrderStatus: (id, status) => operacionesClient.post(`/api/orders/orders/${id}/change_status/`, { status }),
-	addOrderItem: (id, data) => operacionesClient.post(`/api/orders/orders/${id}/add_item/`, data),
-	addPayment: (id, data) => operacionesClient.post(`/api/orders/orders/${id}/add_payment/`, data),
-	getKDSOrders: () => operacionesClient.get('/api/orders/orders/kds/'),
-	getDailySummary: () => operacionesClient.get('/api/orders/orders/daily_summary/')
+	// Órdenes (POS)
+	getOrders: (params) => posClient.get('/api/pos/orders/', params),
+	createOrder: (data) => posClient.post('/api/pos/orders/', data),
+	updateOrderStatus: (id, status) => posClient.post(`/api/pos/orders/${id}/change_status/`, { status }),
+	addOrderItem: (id, data) => posClient.post(`/api/pos/orders/${id}/add_item/`, data),
+	addPayment: (id, data) => posClient.post(`/api/pos/orders/${id}/add_payment/`, data),
+	getKDSOrders: () => posClient.get('/api/pos/orders/kds/'),
+	getDailySummary: () => posClient.get('/api/pos/orders/daily_summary/')
 };
