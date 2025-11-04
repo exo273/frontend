@@ -2,9 +2,14 @@
 	import { onMount } from 'svelte';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import DataTable from '$lib/components/DataTable.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import CardContent from '$lib/components/ui/CardContent.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import ShoppingCart from '$lib/components/icons/ShoppingCart.svelte';
+	import Plus from '$lib/components/icons/Plus.svelte';
+	import Truck from '$lib/components/icons/Truck.svelte';
 
 	let compras = [];
 	let loading = false;
@@ -186,42 +191,93 @@
 </svelte:head>
 
 <div class="space-y-6">
-	<PageHeader
-		title="Compras"
-		subtitle="Registro de compras a proveedores"
-		buttonText="Nueva Compra"
-		buttonIcon="🛒"
-		onButtonClick={openCreateModal}
-	/>
+	<!-- Header -->
+	<div class="flex items-center justify-between">
+		<div>
+			<h1 class="text-3xl font-bold tracking-tight">Compras</h1>
+			<p class="text-muted-foreground">Registro de compras a proveedores</p>
+		</div>
+		<Button on:click={openCreateModal}>
+			<Plus class="h-4 w-4 mr-2" />
+			Nueva Compra
+		</Button>
+	</div>
 
 	<!-- Tabla de compras -->
-	<div class="card">
-		<DataTable {columns} data={compras} {loading} emptyMessage="No hay compras registradas" />
-	</div>
+	<Card>
+		<CardContent class="p-0">
+			{#if loading}
+				<div class="flex items-center justify-center py-8">
+					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+				</div>
+			{:else if compras.length === 0}
+				<div class="text-center py-12">
+					<ShoppingCart class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+					<p class="text-muted-foreground">No hay compras registradas</p>
+				</div>
+			{:else}
+				<div class="overflow-x-auto">
+					<table class="w-full">
+						<thead>
+							<tr class="border-b border-border">
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Fecha</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">N° Factura</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Proveedor</th>
+								<th class="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Items</th>
+								<th class="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Total</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Registrado</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each compras as compra}
+								<tr class="border-b border-border hover:bg-accent transition-colors">
+									<td class="py-3 px-4 text-sm">{new Date(compra.fecha_compra).toLocaleDateString('es-PE')}</td>
+									<td class="py-3 px-4 font-medium">{compra.numero_factura}</td>
+									<td class="py-3 px-4 text-sm">{compra.proveedor?.nombre || '-'}</td>
+									<td class="py-3 px-4 text-center text-sm">{compra.detalles?.length || 0}</td>
+									<td class="py-3 px-4 text-right font-medium">S/ {parseFloat(compra.total || 0).toFixed(2)}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{new Date(compra.fecha_creacion).toLocaleString('es-PE')}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</CardContent>
+	</Card>
 </div>
 
 <!-- Modal Nueva Compra -->
-<Modal bind:show={showModal} title="Registrar Nueva Compra" size="xl">
-	<form on:submit|preventDefault={handleSubmit} class="space-y-6">
-		<!-- Información de la compra -->
-		<div class="card variant-ghost-surface p-4 space-y-4">
-			<h4 class="h4">📋 Información de la Compra</h4>
+{#if showModal}
+	<Dialog open={showModal} onClose={() => (showModal = false)}>
+		<div class="space-y-6">
+			<div>
+				<h2 class="text-lg font-semibold">Registrar Nueva Compra</h2>
+			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-				<label class="label">
-					<span>Proveedor *</span>
-					<select bind:value={formData.proveedor} required class="select">
-						<option value="">Seleccione...</option>
-						{#each proveedores as proveedor}
-							<option value={proveedor.id}>{proveedor.nombre}</option>
-						{/each}
-					</select>
-				</label>
+			<form on:submit|preventDefault={handleSubmit} class="space-y-6">
+				<!-- Información de la compra -->
+				<div class="space-y-4">
+					<h4 class="text-sm font-semibold flex items-center gap-2">
+						<Truck class="h-4 w-4" />
+						Información de la Compra
+					</h4>
 
-				<label class="label">
-					<span>Fecha *</span>
-					<input type="date" bind:value={formData.fecha_compra} required class="input" />
-				</label>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium">Proveedor *</label>
+							<select bind:value={formData.proveedor} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+								<option value="">Seleccione...</option>
+								{#each proveedores as proveedor}
+									<option value={proveedor.id}>{proveedor.nombre}</option>
+								{/each}
+							</select>
+						</div>
+
+						<div class="space-y-2">
+							<label class="text-sm font-medium">Fecha *</label>
+							<Input type="date" bind:value={formData.fecha_compra} required />
+						</div>
 
 				<label class="label">
 					<span>N° Factura</span>
