@@ -14,6 +14,11 @@
 	function togglePassword() {
 		showPassword = !showPassword;
 	}
+
+	function handleInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		value = target.value;
+	}
 </script>
 
 <div class="w-full space-y-1">
@@ -25,7 +30,8 @@
 				isPassword && "pr-10",
 				className
 			)}
-			bind:value
+			{value}
+			on:input={handleInput}
 			{...$$restProps}
 		/>
 		{#if isPassword}
