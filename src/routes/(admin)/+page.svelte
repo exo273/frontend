@@ -1,7 +1,13 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
+	import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui';
+	import Package from '$lib/components/icons/Package.svelte';
+	import Users from '$lib/components/icons/Users.svelte';
+	import FileText from '$lib/components/icons/FileText.svelte';
+	import CalendarCheck from '$lib/components/icons/CalendarCheck.svelte';
+	import ShoppingCart from '$lib/components/icons/ShoppingCart.svelte';
 
 	let loading = true;
 	let stats = {
@@ -67,136 +73,149 @@
 <div class="space-y-6">
 	<!-- Header -->
 	<div>
-		<h1 class="h1">Dashboard</h1>
+		<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
 		<p class="text-muted-foreground">Resumen general del sistema</p>
 	</div>
 
 	{#if loading}
 		<div class="flex justify-center items-center p-12">
-			<span class="text-6xl animate-spin">⏳</span>
+			<div class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
 		</div>
 	{:else}
 		<!-- Stats Cards -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			<!-- Productos -->
-			<div class="card p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-sm text-muted-foreground">Productos</p>
-						<h3 class="text-3xl font-bold">{stats.productos_totales}</h3>
-						{#if stats.productos_stock_bajo > 0}
-							<p class="text-sm text-warning-500 mt-1">
-								⚠️ {stats.productos_stock_bajo} con stock bajo
-							</p>
-						{/if}
-					</div>
-					<div class="text-5xl">📦</div>
-				</div>
-			</div>
+			<Card>
+				<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardTitle class="text-sm font-medium">Total Productos</CardTitle>
+					<Package class="h-4 w-4 text-muted-foreground" />
+				</CardHeader>
+				<CardContent>
+					<div class="text-2xl font-bold">{stats.productos_totales}</div>
+					{#if stats.productos_stock_bajo > 0}
+						<p class="text-xs text-destructive mt-1">
+							{stats.productos_stock_bajo} con stock bajo
+						</p>
+					{:else}
+						<p class="text-xs text-muted-foreground mt-1">
+							Stock saludable
+						</p>
+					{/if}
+				</CardContent>
+			</Card>
 
 			<!-- Proveedores -->
-			<div class="card p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-sm text-muted-foreground">Proveedores Activos</p>
-						<h3 class="text-3xl font-bold">{stats.proveedores_activos}</h3>
-					</div>
-					<div class="text-5xl">🚚</div>
-				</div>
-			</div>
+			<Card>
+				<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardTitle class="text-sm font-medium">Proveedores Activos</CardTitle>
+					<Users class="h-4 w-4 text-muted-foreground" />
+				</CardHeader>
+				<CardContent>
+					<div class="text-2xl font-bold">{stats.proveedores_activos}</div>
+					<p class="text-xs text-muted-foreground mt-1">
+						Total registrados
+					</p>
+				</CardContent>
+			</Card>
 
 			<!-- Items del Menú -->
-			<div class="card p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-sm text-muted-foreground">Items en el Menú</p>
-						<h3 class="text-3xl font-bold">{stats.items_menu}</h3>
-					</div>
-					<div class="text-5xl">📋</div>
-				</div>
-			</div>
+			<Card>
+				<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardTitle class="text-sm font-medium">Items en el Menú</CardTitle>
+					<FileText class="h-4 w-4 text-muted-foreground" />
+				</CardHeader>
+				<CardContent>
+					<div class="text-2xl font-bold">{stats.items_menu}</div>
+					<p class="text-xs text-muted-foreground mt-1">
+						Disponibles
+					</p>
+				</CardContent>
+			</Card>
 
 			<!-- Órdenes Hoy -->
-			<div class="card p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-sm text-muted-foreground">Órdenes Hoy</p>
-						<h3 class="text-3xl font-bold">{stats.ordenes_hoy}</h3>
-					</div>
-					<div class="text-5xl">🧾</div>
-				</div>
-			</div>
-
-			<!-- Ventas Hoy -->
-			<div class="card p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-sm text-muted-foreground">Ventas Hoy</p>
-						<h3 class="text-3xl font-bold">{formatCurrency(stats.ventas_hoy)}</h3>
-					</div>
-					<div class="text-5xl">💰</div>
-				</div>
-			</div>
+			<Card>
+				<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardTitle class="text-sm font-medium">Órdenes Hoy</CardTitle>
+					<CalendarCheck class="h-4 w-4 text-muted-foreground" />
+				</CardHeader>
+				<CardContent>
+					<div class="text-2xl font-bold">{stats.ordenes_hoy}</div>
+					<p class="text-xs text-muted-foreground mt-1">
+						+0% desde ayer
+					</p>
+				</CardContent>
+			</Card>
 		</div>
 
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
 			<!-- Productos con Stock Bajo -->
-			<div class="card">
-				<header class="card-header flex justify-between items-center">
-					<h3 class="h3">⚠️ Productos con Stock Bajo</h3>
-					<a href="/inventario" class="btn btn-sm variant-ghost-primary">Ver todo</a>
-				</header>
-				<section class="p-4">
+			<Card class="col-span-4">
+				<CardHeader>
+					<CardTitle>Productos con Stock Bajo</CardTitle>
+				</CardHeader>
+				<CardContent>
 					{#if lowStockProducts.length === 0}
 						<p class="text-center text-muted-foreground py-8">
-							✅ No hay productos con stock bajo
+							No hay productos con stock bajo
 						</p>
 					{:else}
 						<div class="space-y-3">
 							{#each lowStockProducts as product}
-								<div class="flex justify-between items-center p-3 bg-sidebar rounded-md">
-									<div>
-										<p class="font-semibold">{product.nombre}</p>
+								<div class="flex items-center justify-between rounded-lg border p-3">
+									<div class="space-y-1">
+										<p class="text-sm font-medium leading-none">{product.nombre}</p>
 										<p class="text-sm text-muted-foreground">
 											Stock: {product.cantidad_actual} {product.unidad}
 										</p>
 									</div>
-									<span class="badge variant-filled-warning">
+									<div class="text-sm font-medium text-destructive">
 										Mín: {product.stock_minimo || 0}
-									</span>
+									</div>
 								</div>
 							{/each}
 						</div>
 					{/if}
-				</section>
-			</div>
+				</CardContent>
+			</Card>
 
 			<!-- Accesos Rápidos -->
-			<div class="card">
-				<header class="card-header">
-					<h3 class="h3">🚀 Accesos Rápidos</h3>
-				</header>
-				<section class="p-4">
+			<Card class="col-span-3">
+				<CardHeader>
+					<CardTitle>Accesos Rápidos</CardTitle>
+				</CardHeader>
+				<CardContent>
 					<div class="grid grid-cols-2 gap-4">
-						<a href="/compras" class="btn variant-filled-surface h-24 flex flex-col items-center justify-center gap-2">
-							<span class="text-3xl">🛒</span>
-							<span>Nueva Compra</span>
+						<a 
+							href="/compras" 
+							class="flex flex-col items-center justify-center gap-2 rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+						>
+							<ShoppingCart class="h-8 w-8" />
+							<span class="text-sm font-medium">Nueva Compra</span>
 						</a>
-						<a href="/inventario" class="btn variant-filled-surface h-24 flex flex-col items-center justify-center gap-2">
-							<span class="text-3xl">📦</span>
-							<span>Inventario</span>
+						<a 
+							href="/inventario" 
+							class="flex flex-col items-center justify-center gap-2 rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+						>
+							<Package class="h-8 w-8" />
+							<span class="text-sm font-medium">Inventario</span>
 						</a>
-						<a href="/recetas" class="btn variant-filled-surface h-24 flex flex-col items-center justify-center gap-2">
-							<span class="text-3xl">📖</span>
-							<span>Recetas</span>
+						<a 
+							href="/recetas" 
+							class="flex flex-col items-center justify-center gap-2 rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+						>
+							<FileText class="h-8 w-8" />
+							<span class="text-sm font-medium">Recetas</span>
 						</a>
-						<a href="/carta" class="btn variant-filled-surface h-24 flex flex-col items-center justify-center gap-2">
-							<span class="text-3xl">📋</span>
-							<span>Carta/Menú</span>
+						<a 
+							href="/carta" 
+							class="flex flex-col items-center justify-center gap-2 rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+						>
+							<FileText class="h-8 w-8" />
+							<span class="text-sm font-medium">Carta/Menú</span>
 						</a>
 					</div>
-				</section>
-			</div>
+				</CardContent>
+			</Card>
 		</div>
 	{/if}
 </div>
