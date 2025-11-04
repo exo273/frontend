@@ -24,6 +24,7 @@
 	let showPaymentModal = false;
 	let searchQuery = '';
 	let selectedCategory = '';
+	let view = 'tables'; // 'tables' o 'order'
 
 	// Order state
 	let orderItems = [];
