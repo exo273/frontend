@@ -29,6 +29,7 @@
 	// Order state
 	let orderItems = [];
 	let currentOrder = null;
+	let currentTable = null;
 
 	// Payment data
 	let paymentData = {
