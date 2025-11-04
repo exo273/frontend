@@ -2,15 +2,26 @@
 	import { onMount } from 'svelte';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import DataTable from '$lib/components/DataTable.svelte';
-	import SearchBar from '$lib/components/SearchBar.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import CardHeader from '$lib/components/ui/CardHeader.svelte';
+	import CardTitle from '$lib/components/ui/CardTitle.svelte';
+	import CardContent from '$lib/components/ui/CardContent.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import FileText from '$lib/components/icons/FileText.svelte';
+	import Plus from '$lib/components/icons/Plus.svelte';
+	import Edit2 from '$lib/components/icons/Edit2.svelte';
+	import Search from '$lib/components/icons/Search.svelte';
+	import Check from '$lib/components/icons/Check.svelte';
+	import X from '$lib/components/icons/X.svelte';
 
 	let menuItems = [];
 	let loading = false;
 	let searchQuery = '';
 	let categoriaFilter = '';
+	let filteredItems = [];
 	let categorias = [];
 	let recetas = [];
 
@@ -30,65 +41,14 @@
 		imagen_url: ''
 	};
 
-	// Columnas de la tabla
-	const columns = [
-		{ key: 'nombre', label: 'Plato' },
-		{ key: 'descripcion', label: 'Descripción' },
-		{
-			key: 'categoria',
-			label: 'Categoría',
-			format: (val) => val?.nombre || '-'
-		},
-		{
-			key: 'precio',
-			label: 'Precio',
-			format: (val) => `S/ ${parseFloat(val).toFixed(2)}`,
-			align: 'right'
-		},
-		{
-			key: 'costo',
-			label: 'Costo',
-			format: (val) => `S/ ${parseFloat(val || 0).toFixed(2)}`,
-			align: 'right'
-		},
-		{
-			key: 'margen',
-			label: 'Margen',
-			format: (val, row) => {
-				const margen = ((row.precio - (row.costo || 0)) / row.precio) * 100;
-				return `${margen.toFixed(1)}%`;
-			},
-			align: 'center'
-		},
-		{
-			key: 'disponible',
-			label: 'Estado',
-			format: (val) => (val ? '✅ Disponible' : '❌ No disponible'),
-			align: 'center'
-		}
-	];
-
-	// Acciones de la tabla
-	const actions = [
-		{
-			label: 'Editar',
-			icon: '✏️',
-			class: 'variant-ghost-surface',
-			onClick: openEditModal
-		},
-		{
-			label: 'Toggle',
-			icon: '🔄',
-			class: 'variant-ghost-warning',
-			onClick: toggleDisponibilidad
-		},
-		{
-			label: 'Recalcular',
-			icon: '🔢',
-			class: 'variant-ghost-primary',
-			onClick: recalcularCosto
-		}
-	];
+	$: filteredItems = menuItems.filter((item) => {
+		const matchesSearch =
+			!searchQuery ||
+			item.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			item.descripcion?.toLowerCase().includes(searchQuery.toLowerCase());
+		const matchesCategory = !categoriaFilter || item.categoria?.id === parseInt(categoriaFilter);
+		return matchesSearch && matchesCategory;
+	});
 
 	onMount(async () => {
 		await Promise.all([loadMenuItems(), loadCategorias(), loadRecetas()]);
@@ -213,9 +173,12 @@
 		}
 	}
 
-	function handleSearch(query) {
-		searchQuery = query;
-		loadMenuItems();
+	function handleSearch() {
+		// Búsqueda reactiva
+	}
+
+	function handleCategoryFilter() {
+		// Filtro reactivo
 	}
 </script>
 
@@ -223,141 +186,259 @@
 	<title>Carta/Menú - SIGR</title>
 </svelte:head>
 
-<div class="space-y-6">
-	<PageHeader
-		title="Carta / Menú"
-		subtitle="Gestión de platos y bebidas del menú"
-		buttonText="Nuevo Item"
-		buttonIcon="➕"
-		onButtonClick={openCreateModal}
-	/>
-
-	<!-- Filters -->
-	<div class="card p-4">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<SearchBar
-				bind:value={searchQuery}
-				placeholder="Buscar en el menú..."
-				onSearch={handleSearch}
-			/>
-			<select bind:value={categoriaFilter} on:change={loadMenuItems} class="select">
-				<option value="">Todas las categorías</option>
-				{#each categorias as categoria}
-					<option value={categoria.id}>{categoria.nombre}</option>
-				{/each}
-			</select>
+<div class="p-6 space-y-6">
+	<!-- Header -->
+	<div class="flex items-center justify-between">
+		<div class="flex items-center gap-3">
+			<div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+				<FileText class="h-5 w-5 text-primary" />
+			</div>
+			<div>
+				<h1 class="text-2xl font-bold">Carta / Menú</h1>
+				<p class="text-sm text-muted-foreground">Gestión de platos y bebidas del menú</p>
+			</div>
 		</div>
+		<Button on:click={openCreateModal}>
+			<Plus class="h-4 w-4 mr-2" />
+			Nuevo Item
+		</Button>
 	</div>
 
-	<!-- Tabla de items del menú -->
-	<div class="card">
-		<DataTable
-			{columns}
-			data={menuItems}
-			{actions}
-			{loading}
-			emptyMessage="No hay items en el menú"
-		/>
-	</div>
-</div>
-
-<!-- Modal Crear/Editar Item -->
-<Modal
-	bind:show={showModal}
-	title={modalMode === 'create' ? 'Nuevo Item del Menú' : 'Editar Item del Menú'}
-	size="lg"
->
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<label class="label">
-			<span>Nombre del Plato *</span>
-			<input
-				type="text"
-				bind:value={formData.nombre}
-				required
-				class="input"
-				placeholder="Ej: Lomo Saltado"
-			/>
-		</label>
-
-		<label class="label">
-			<span>Descripción</span>
-			<textarea
-				bind:value={formData.descripcion}
-				rows="3"
-				class="textarea"
-				placeholder="Descripción del plato..."
-			/>
-		</label>
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<label class="label">
-				<span>Categoría</span>
-				<select bind:value={formData.categoria} class="select">
-					<option value="">Sin categoría</option>
+	<!-- Filtros -->
+	<Card>
+		<CardContent class="p-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="relative">
+					<Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+					<Input
+						type="text"
+						placeholder="Buscar en el menú..."
+						bind:value={searchQuery}
+						class="pl-10"
+					/>
+				</div>
+				<select 
+					bind:value={categoriaFilter} 
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+				>
+					<option value="">Todas las categorías</option>
 					{#each categorias as categoria}
 						<option value={categoria.id}>{categoria.nombre}</option>
 					{/each}
 				</select>
-			</label>
+			</div>
+		</CardContent>
+	</Card>
 
-			<label class="label">
-				<span>Receta Asociada</span>
-				<select bind:value={formData.receta} class="select">
-					<option value="">Sin receta</option>
-					{#each recetas as receta}
-						<option value={receta.id}>
-							{receta.nombre} (S/ {receta.costo_total?.toFixed(2) || '0.00'})
-						</option>
-					{/each}
-				</select>
-			</label>
+	<!-- Lista de items del menú -->
+	{#if loading}
+		<div class="flex justify-center py-12">
+			<div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+		</div>
+	{:else if filteredItems.length === 0}
+		<Card>
+			<CardContent class="p-12 text-center">
+				<FileText class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+				<p class="text-muted-foreground">
+					{searchQuery || categoriaFilter ? 'No se encontraron items' : 'No hay items en el menú'}
+				</p>
+			</CardContent>
+		</Card>
+	{:else}
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+			{#each filteredItems as item}
+				<Card class="hover:border-primary/50 transition-colors">
+					<CardHeader>
+						<CardTitle class="flex items-start justify-between">
+							<span class="text-lg">{item.nombre}</span>
+							<div class="flex items-center gap-2">
+								{#if item.disponible}
+									<Badge variant="success">
+										<Check class="h-3 w-3 mr-1" />
+										Disponible
+									</Badge>
+								{:else}
+									<Badge variant="destructive">
+										<X class="h-3 w-3 mr-1" />
+										No disponible
+									</Badge>
+								{/if}
+								<Button variant="ghost" size="sm" on:click={() => openEditModal(item)}>
+									<Edit2 class="h-4 w-4" />
+								</Button>
+							</div>
+						</CardTitle>
+					</CardHeader>
+					<CardContent class="space-y-3">
+						{#if item.descripcion}
+							<p class="text-sm text-muted-foreground line-clamp-2">{item.descripcion}</p>
+						{/if}
+
+						{#if item.categoria}
+							<Badge variant="outline">{item.categoria.nombre}</Badge>
+						{/if}
+
+						<div class="space-y-2 pt-3 border-t border-border">
+							<div class="flex items-center justify-between">
+								<span class="text-sm text-muted-foreground">Precio:</span>
+								<span class="text-lg font-semibold text-green-600">S/ {parseFloat(item.precio).toFixed(2)}</span>
+							</div>
+							<div class="flex items-center justify-between text-sm">
+								<span class="text-muted-foreground">Costo:</span>
+								<span>S/ {parseFloat(item.costo || 0).toFixed(2)}</span>
+							</div>
+							<div class="flex items-center justify-between text-sm">
+								<span class="text-muted-foreground">Margen:</span>
+								<span class="font-medium">
+									{((item.precio - (item.costo || 0)) / item.precio * 100).toFixed(1)}%
+								</span>
+							</div>
+						</div>
+
+						<div class="flex gap-2 pt-2">
+							<Button 
+								variant="outline" 
+								size="sm" 
+								class="flex-1"
+								on:click={() => toggleDisponibilidad(item)}
+							>
+								{item.disponible ? 'Deshabilitar' : 'Habilitar'}
+							</Button>
+							{#if item.receta}
+								<Button 
+									variant="outline" 
+									size="sm"
+									on:click={() => recalcularCosto(item)}
+								>
+									Recalcular
+								</Button>
+							{/if}
+						</div>
+					</CardContent>
+				</Card>
+			{/each}
+		</div>
+	{/if}
+</div>
+
+<!-- Modal Crear/Editar Item -->
+<Dialog bind:open={showModal}>
+	<div class="space-y-6">
+		<!-- Header -->
+		<div>
+			<h2 class="text-xl font-semibold">
+				{modalMode === 'create' ? 'Nuevo Item del Menú' : 'Editar Item del Menú'}
+			</h2>
+			<p class="text-sm text-muted-foreground mt-1">
+				{modalMode === 'create' ? 'Crea un nuevo item para la carta' : 'Modifica el item del menú'}
+			</p>
 		</div>
 
-		<label class="label">
-			<span>Precio de Venta *</span>
-			<input
-				type="number"
-				bind:value={formData.precio}
-				step="0.01"
-				min="0"
-				required
-				class="input"
-				placeholder="S/ 0.00"
-			/>
-		</label>
-
-		<label class="label">
-			<span>URL de Imagen</span>
-			<input
-				type="url"
-				bind:value={formData.imagen_url}
-				class="input"
-				placeholder="https://ejemplo.com/imagen.jpg"
-			/>
-		</label>
-
-		<label class="flex items-center space-x-2">
-			<input type="checkbox" bind:checked={formData.disponible} class="checkbox" />
-			<span>Disponible para venta</span>
-		</label>
-
-		{#if formData.receta}
-			<div class="card variant-ghost-primary p-4">
-				<p class="text-sm">
-					💡 <strong>Nota:</strong> El costo de este item se calculará automáticamente basándose
-					en la receta seleccionada.
-				</p>
+		<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Nombre del Plato *</label>
+				<Input
+					type="text"
+					bind:value={formData.nombre}
+					required
+					placeholder="Ej: Lomo Saltado"
+				/>
 			</div>
-		{/if}
-	</form>
 
-	<div slot="footer" class="flex justify-end gap-2">
-		<button type="button" class="btn variant-ghost-surface" on:click={() => (showModal = false)}>
-			Cancelar
-		</button>
-		<button type="button" class="btn variant-filled-primary" on:click={handleSubmit}>
-			{modalMode === 'create' ? '💾 Crear Item' : '💾 Guardar Cambios'}
-		</button>
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Descripción</label>
+				<textarea
+					bind:value={formData.descripcion}
+					rows="3"
+					class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					placeholder="Descripción del plato..."
+				/>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Categoría</label>
+					<select 
+						bind:value={formData.categoria} 
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					>
+						<option value="">Sin categoría</option>
+						{#each categorias as categoria}
+							<option value={categoria.id}>{categoria.nombre}</option>
+						{/each}
+					</select>
+				</div>
+
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Receta Asociada</label>
+					<select 
+						bind:value={formData.receta} 
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					>
+						<option value="">Sin receta</option>
+						{#each recetas as receta}
+							<option value={receta.id}>
+								{receta.nombre} (S/ {receta.costo_total?.toFixed(2) || '0.00'})
+							</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Precio de Venta *</label>
+				<Input
+					type="number"
+					bind:value={formData.precio}
+					step="0.01"
+					min="0"
+					required
+					placeholder="S/ 0.00"
+				/>
+			</div>
+
+			<div class="space-y-2">
+				<label class="text-sm font-medium">URL de Imagen</label>
+				<Input
+					type="url"
+					bind:value={formData.imagen_url}
+					placeholder="https://ejemplo.com/imagen.jpg"
+				/>
+			</div>
+
+			<div class="flex items-center space-x-2">
+				<input 
+					type="checkbox" 
+					bind:checked={formData.disponible} 
+					id="disponible"
+					class="h-4 w-4 rounded border-input"
+				/>
+				<label for="disponible" class="text-sm font-medium">
+					Disponible para venta
+				</label>
+			</div>
+
+			{#if formData.receta}
+				<Card class="bg-primary/5 border-primary/20">
+					<CardContent class="p-4">
+						<p class="text-sm text-muted-foreground">
+							<strong>Nota:</strong> El costo de este item se calculará automáticamente basándose
+							en la receta seleccionada.
+						</p>
+					</CardContent>
+				</Card>
+			{/if}
+		</form>
+
+		<!-- Footer -->
+		<div class="flex justify-end gap-2 pt-4">
+			<Button variant="ghost" on:click={() => (showModal = false)}>
+				Cancelar
+			</Button>
+			<Button on:click={handleSubmit}>
+				{modalMode === 'create' ? 'Crear Item' : 'Guardar Cambios'}
+			</Button>
+		</div>
 	</div>
-</Modal>
+</Dialog>
 
