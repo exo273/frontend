@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - VITE_USE_GATEWAY=${VITE_USE_GATEWAY:-true}
+      - VITE_API_GATEWAY_URL=${VITE_API_GATEWAY_URL}
+    ports:
+      - "5173:5173"
+    networks:
+      - restaurant-network
+
+networks:
+  restaurant-network:
+    external: true
