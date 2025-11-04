@@ -208,12 +208,14 @@
 <div class="space-y-6">
 	<!-- Header -->
 	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
-				<Package class="h-8 w-8" />
-				Inventario
-			</h1>
-			<p class="text-muted-foreground">Gestión de productos y stock</p>
+		<div class="flex items-center gap-3">
+			<div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+				<Package class="h-5 w-5 text-primary" />
+			</div>
+			<div>
+				<h1 class="text-2xl font-bold">Inventario</h1>
+				<p class="text-sm text-muted-foreground">Gestión de productos y stock</p>
+			</div>
 		</div>
 		<Button on:click={openCreateModal}>
 			<Plus class="h-4 w-4 mr-2" />
