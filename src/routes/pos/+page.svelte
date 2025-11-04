@@ -14,6 +14,8 @@
 	import Trash2 from '$lib/components/icons/Trash2.svelte';
 	import CreditCard from '$lib/components/icons/CreditCard.svelte';
 	import MoreVertical from '$lib/components/icons/MoreVertical.svelte';
+	import Armchair from '$lib/components/icons/Armchair.svelte';
+	import Loader from '$lib/components/icons/Loader.svelte';
 
 	let zones = [];
 	let tables = [];
@@ -274,7 +276,7 @@
 
 		{#if loading}
 			<div class="flex justify-center p-12">
-				<span class="text-6xl animate-spin">⏳</span>
+				<Loader class="h-12 w-12 animate-spin text-primary" />
 			</div>
 		{:else}
 			{#each zones as zone}
@@ -286,7 +288,7 @@
 								class={getTableClass(table)}
 								on:click={() => selectTable(table)}
 							>
-								<div class="text-3xl mb-2">🪑</div>
+								<Armchair class="h-8 w-8 mb-2 mx-auto" />
 								<div class="font-bold">{table.numero}</div>
 								<div class="text-xs opacity-75">{table.capacidad} pax</div>
 							</button>

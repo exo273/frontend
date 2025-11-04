@@ -65,7 +65,7 @@
 	}
 
 	function launchPOS() {
-		goto('/pos');
+		window.location.href = '/pos';
 	}
 
 	function isActive(href) {
