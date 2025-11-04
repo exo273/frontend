@@ -2,10 +2,16 @@
 	import { onMount } from 'svelte';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import DataTable from '$lib/components/DataTable.svelte';
-	import SearchBar from '$lib/components/SearchBar.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import CardContent from '$lib/components/ui/CardContent.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Users from '$lib/components/icons/Users.svelte';
+	import Plus from '$lib/components/icons/Plus.svelte';
+	import Edit from '$lib/components/icons/Edit.svelte';
+	import Activity from '$lib/components/icons/Activity.svelte';
 
 	let proveedores = [];
 	let loading = false;
@@ -27,7 +33,7 @@
 		activo: true
 	};
 
-	// Columnas de la tabla
+	// Columnas de la tabla - sin emojis
 	const columns = [
 		{ key: 'nombre', label: 'Proveedor' },
 		{ key: 'ruc', label: 'RUC' },
@@ -37,22 +43,21 @@
 		{
 			key: 'activo',
 			label: 'Estado',
-			format: (val) => (val ? '✅ Activo' : '❌ Inactivo'),
 			align: 'center'
 		}
 	];
 
-	// Acciones de la tabla
+	// Acciones de la tabla - sin emojis
 	const actions = [
 		{
 			label: 'Editar',
-			icon: '✏️',
+			icon: Edit,
 			class: 'variant-ghost-surface',
 			onClick: openEditModal
 		},
 		{
 			label: 'Toggle',
-			icon: '🔄',
+			icon: Activity,
 			class: 'variant-ghost-warning',
 			onClick: toggleProveedorStatus
 		}
@@ -143,123 +148,169 @@
 </svelte:head>
 
 <div class="space-y-6">
-	<PageHeader
-		title="Proveedores"
-		subtitle="Gestión de proveedores"
-		buttonText="Nuevo Proveedor"
-		buttonIcon="➕"
-		onButtonClick={openCreateModal}
-	/>
+	<!-- Header -->
+	<div class="flex items-center justify-between">
+		<div>
+			<h1 class="text-3xl font-bold tracking-tight">Proveedores</h1>
+			<p class="text-muted-foreground">Gestión de proveedores</p>
+		</div>
+		<Button on:click={openCreateModal}>
+			<Plus class="h-4 w-4 mr-2" />
+			Nuevo Proveedor
+		</Button>
+	</div>
 
 	<!-- Búsqueda -->
-	<div class="card p-4">
-		<SearchBar
-			bind:value={searchQuery}
-			placeholder="Buscar proveedores..."
-			onSearch={handleSearch}
-		/>
-	</div>
+	<Card>
+		<CardContent class="pt-6">
+			<Input
+				bind:value={searchQuery}
+				on:input={() => loadProveedores()}
+				placeholder="Buscar proveedores..."
+				class="w-full"
+			/>
+		</CardContent>
+	</Card>
 
 	<!-- Tabla de proveedores -->
-	<div class="card">
-		<DataTable
-			{columns}
-			data={proveedores}
-			{actions}
-			{loading}
-			emptyMessage="No hay proveedores registrados"
-		/>
-	</div>
+	<Card>
+		<CardContent class="p-0">
+			{#if loading}
+				<div class="flex items-center justify-center py-8">
+					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+				</div>
+			{:else if proveedores.length === 0}
+				<div class="text-center py-12">
+					<Users class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+					<p class="text-muted-foreground">No hay proveedores registrados</p>
+				</div>
+			{:else}
+				<div class="overflow-x-auto">
+					<table class="w-full">
+						<thead>
+							<tr class="border-b border-border">
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Proveedor</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">RUC</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Teléfono</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Contacto</th>
+								<th class="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Estado</th>
+								<th class="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each proveedores as proveedor}
+								<tr class="border-b border-border hover:bg-accent transition-colors">
+									<td class="py-3 px-4 font-medium">{proveedor.nombre}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{proveedor.ruc}</td>
+									<td class="py-3 px-4 text-sm">{proveedor.telefono || '-'}</td>
+									<td class="py-3 px-4 text-sm">{proveedor.email || '-'}</td>
+									<td class="py-3 px-4 text-sm">{proveedor.contacto_nombre || '-'}</td>
+									<td class="py-3 px-4 text-center">
+										<Badge variant={proveedor.activo ? 'success' : 'secondary'}>
+											{proveedor.activo ? 'Activo' : 'Inactivo'}
+										</Badge>
+									</td>
+									<td class="py-3 px-4 text-right">
+										<div class="flex items-center justify-end gap-2">
+											<Button variant="ghost" size="sm" on:click={() => openEditModal(proveedor)}>
+												<Edit class="h-4 w-4" />
+											</Button>
+											<Button variant="ghost" size="sm" on:click={() => toggleProveedorStatus(proveedor)}>
+												<Activity class="h-4 w-4" />
+											</Button>
+										</div>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</CardContent>
+	</Card>
 </div>
 
 <!-- Modal Crear/Editar Proveedor -->
-<Modal
-	bind:show={showModal}
-	title={modalMode === 'create' ? 'Nuevo Proveedor' : 'Editar Proveedor'}
-	size="lg"
->
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<label class="label">
-				<span>Nombre / Razón Social *</span>
-				<input
-					type="text"
-					bind:value={formData.nombre}
-					required
-					class="input"
-					placeholder="Nombre del proveedor"
-				/>
-			</label>
+{#if showModal}
+	<Dialog open={showModal} onClose={() => (showModal = false)}>
+		<div class="space-y-6">
+			<div>
+				<h2 class="text-lg font-semibold">{modalMode === 'create' ? 'Nuevo Proveedor' : 'Editar Proveedor'}</h2>
+			</div>
 
-			<label class="label">
-				<span>RUC *</span>
-				<input
-					type="text"
-					bind:value={formData.ruc}
-					required
-					pattern="[0-9]{11}"
-					maxlength="11"
-					class="input"
-					placeholder="12345678901"
-				/>
-			</label>
+			<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Nombre / Razón Social *</label>
+						<Input
+							bind:value={formData.nombre}
+							required
+							placeholder="Nombre del proveedor"
+						/>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-sm font-medium">RUC *</label>
+						<Input
+							bind:value={formData.ruc}
+							required
+							maxlength="11"
+							placeholder="12345678901"
+						/>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Dirección</label>
+					<Input
+						bind:value={formData.direccion}
+						placeholder="Dirección completa"
+					/>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Teléfono</label>
+						<Input
+							type="tel"
+							bind:value={formData.telefono}
+							placeholder="+51 999 999 999"
+						/>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Email</label>
+						<Input
+							type="email"
+							bind:value={formData.email}
+							placeholder="email@proveedor.com"
+						/>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Nombre de Contacto</label>
+					<Input
+						bind:value={formData.contacto_nombre}
+						placeholder="Nombre del contacto principal"
+					/>
+				</div>
+
+				<label class="flex items-center space-x-2">
+					<input type="checkbox" bind:checked={formData.activo} class="h-4 w-4 rounded border-input" />
+					<span class="text-sm font-medium">Proveedor Activo</span>
+				</label>
+
+				<div class="flex justify-end gap-2 pt-4">
+					<Button type="button" variant="ghost" on:click={() => (showModal = false)}>
+						Cancelar
+					</Button>
+					<Button type="submit">
+						{modalMode === 'create' ? 'Crear' : 'Guardar'}
+					</Button>
+				</div>
+			</form>
 		</div>
-
-		<label class="label">
-			<span>Dirección</span>
-			<input
-				type="text"
-				bind:value={formData.direccion}
-				class="input"
-				placeholder="Dirección completa"
-			/>
-		</label>
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<label class="label">
-				<span>Teléfono</span>
-				<input
-					type="tel"
-					bind:value={formData.telefono}
-					class="input"
-					placeholder="+51 999 999 999"
-				/>
-			</label>
-
-			<label class="label">
-				<span>Email</span>
-				<input
-					type="email"
-					bind:value={formData.email}
-					class="input"
-					placeholder="email@proveedor.com"
-				/>
-			</label>
-		</div>
-
-		<label class="label">
-			<span>Nombre de Contacto</span>
-			<input
-				type="text"
-				bind:value={formData.contacto_nombre}
-				class="input"
-				placeholder="Nombre del contacto principal"
-			/>
-		</label>
-
-		<label class="flex items-center space-x-2">
-			<input type="checkbox" bind:checked={formData.activo} class="checkbox" />
-			<span>Proveedor Activo</span>
-		</label>
-	</form>
-
-	<div slot="footer" class="flex justify-end gap-2">
-		<button type="button" class="btn variant-ghost-surface" on:click={() => (showModal = false)}>
-			Cancelar
-		</button>
-		<button type="button" class="btn variant-filled-primary" on:click={handleSubmit}>
-			{modalMode === 'create' ? 'Crear' : 'Guardar'}
-		</button>
-	</div>
-</Modal>
-
+	</Dialog>
+{/if}
