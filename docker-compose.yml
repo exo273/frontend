@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -11,8 +9,6 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - ORIGIN=https://alpha.kvernicola.cl
-    ports:
-      - "3000:3000"
     networks:
       - restaurant-network
 
