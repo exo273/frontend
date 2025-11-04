@@ -151,7 +151,10 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Proveedores</h1>
+			<h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+				<Users class="h-8 w-8" />
+				Proveedores
+			</h1>
 			<p class="text-muted-foreground">Gestión de proveedores</p>
 		</div>
 		<Button on:click={openCreateModal}>

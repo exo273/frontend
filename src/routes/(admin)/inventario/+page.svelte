@@ -209,7 +209,10 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Inventario</h1>
+			<h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+				<Package class="h-8 w-8" />
+				Inventario
+			</h1>
 			<p class="text-muted-foreground">Gestión de productos y stock</p>
 		</div>
 		<Button on:click={openCreateModal}>

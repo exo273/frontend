@@ -196,7 +196,10 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Compras</h1>
+			<h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+				<ShoppingCart class="h-8 w-8" />
+				Compras
+			</h1>
 			<p class="text-muted-foreground">Registro de compras a proveedores</p>
 		</div>
 		<Button on:click={openCreateModal}>
