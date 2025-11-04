@@ -73,7 +73,7 @@
 			</header>
 			
 			<section class="space-y-4">
-				<p class="text-surface-600-300-token">
+				<p class="text-muted-foreground">
 					Abra la siguiente URL en el navegador de su Smart TV o dispositivo de señalización. 
 					El menú se actualizará automáticamente cuando modifique productos en el sistema.
 				</p>
@@ -145,7 +145,7 @@
 			<section class="space-y-4">
 				<div class="space-y-2">
 					<h3 class="h3">Configurar Smart TV</h3>
-					<ol class="list-decimal list-inside space-y-1 text-surface-600-300-token">
+					<ol class="list-decimal list-inside space-y-1 text-muted-foreground">
 						<li>Copie la URL mostrada arriba</li>
 						<li>Abra el navegador web de su Smart TV</li>
 						<li>Pegue la URL en la barra de direcciones</li>
@@ -156,7 +156,7 @@
 				
 				<div class="space-y-2">
 					<h3 class="h3">Actualizaciones Automáticas</h3>
-					<p class="text-surface-600-300-token">
+					<p class="text-muted-foreground">
 						Cada vez que modifique un producto activo en la web (cambio de precio, nombre, 
 						descripción, etc.), todas las pantallas conectadas se actualizarán automáticamente 
 						en tiempo real sin necesidad de recargar la página.
@@ -165,7 +165,7 @@
 				
 				<div class="space-y-2">
 					<h3 class="h3">Requisitos</h3>
-					<ul class="list-disc list-inside space-y-1 text-surface-600-300-token">
+					<ul class="list-disc list-inside space-y-1 text-muted-foreground">
 						<li>Smart TV con navegador web</li>
 						<li>Conexión a Internet estable</li>
 						<li>Resolución mínima: 1920x1080 (Full HD)</li>
@@ -194,15 +194,15 @@
 		<section class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
 			<div class="text-center">
 				<p class="text-4xl font-bold text-primary-500">WebSocket</p>
-				<p class="text-surface-600-300-token">Protocolo de Comunicación</p>
+				<p class="text-muted-foreground">Protocolo de Comunicación</p>
 			</div>
 			<div class="text-center">
 				<p class="text-4xl font-bold text-success-500">Tiempo Real</p>
-				<p class="text-surface-600-300-token">Actualizaciones Instantáneas</p>
+				<p class="text-muted-foreground">Actualizaciones Instantáneas</p>
 			</div>
 			<div class="text-center">
 				<p class="text-4xl font-bold text-secondary-500">Sin Límites</p>
-				<p class="text-surface-600-300-token">Pantallas Simultáneas</p>
+				<p class="text-muted-foreground">Pantallas Simultáneas</p>
 			</div>
 		</section>
 	</div>
@@ -211,3 +211,4 @@
 <style>
 	/* Estilos adicionales si son necesarios */
 </style>
+

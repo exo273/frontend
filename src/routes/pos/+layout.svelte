@@ -28,9 +28,9 @@
 	}
 </script>
 
-<div class="flex flex-col h-screen overflow-hidden bg-surface-50-900-token">
+<div class="flex flex-col h-screen overflow-hidden bg-background">
 	<!-- POS Header (slim) -->
-	<header class="bg-surface-100-800-token border-b border-surface-300-600-token px-4 py-2">
+	<header class="bg-sidebar border-b border-border px-4 py-2">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<button class="btn btn-sm variant-ghost-surface" on:click={backToAdmin} title="Volver al panel de administración">
@@ -57,3 +57,4 @@
 		<slot />
 	</main>
 </div>
+

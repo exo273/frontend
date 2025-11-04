@@ -343,7 +343,7 @@
 				class="input"
 				placeholder="0.00"
 			/>
-			<small class="text-surface-600-300-token">
+			<small class="text-muted-foreground">
 				Stock actual: {selectedProducto?.cantidad_actual || 0}
 				{selectedProducto?.unidad || ''}
 			</small>
@@ -374,3 +374,4 @@
 		</button>
 	</div>
 </Modal>
+

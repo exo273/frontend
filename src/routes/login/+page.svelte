@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<h1 class="h2">Sistema de Gestión</h1>
-			<p class="text-surface-600-300-token">Restaurante</p>
+			<p class="text-muted-foreground">Restaurante</p>
 		</div>
 
 		<!-- Formulario -->
@@ -103,7 +103,7 @@
 		</form>
 
 		<!-- Footer -->
-		<div class="text-center text-sm text-surface-600-300-token">
+		<div class="text-center text-sm text-muted-foreground">
 			<p>© 2024 Sistema de Gestión de Restaurantes</p>
 		</div>
 	</div>
@@ -114,3 +114,5 @@
 		overflow: hidden;
 	}
 </style>
+
+

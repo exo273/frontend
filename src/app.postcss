@@ -95,15 +95,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-	@apply bg-surface-200-700-token;
+	@apply bg-muted;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-surface-400-500-token rounded-full;
+	@apply bg-muted-foreground/30 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	@apply bg-surface-500-400-token;
+	@apply bg-muted-foreground/50;
 }
 
 /* Animaciones */
@@ -139,15 +139,15 @@ body {
 }
 
 .mesa-available {
-	@apply bg-success-500 hover:bg-success-600 text-white;
+	@apply bg-emerald-500 hover:bg-emerald-600 text-white;
 }
 
 .mesa-occupied {
-	@apply bg-error-500 hover:bg-error-600 text-white;
+	@apply bg-red-500 hover:bg-red-600 text-white;
 }
 
 .mesa-reserved {
-	@apply bg-warning-500 hover:bg-warning-600 text-white;
+	@apply bg-yellow-500 hover:bg-yellow-600 text-white;
 }
 
 /* Estilos de impresión */

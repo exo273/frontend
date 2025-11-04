@@ -281,7 +281,7 @@
 	<!-- Vista de Orden -->
 	<div class="grid grid-cols-12 h-full">
 		<!-- Menu Items (izquierda) -->
-		<div class="col-span-8 border-r border-surface-300-600-token overflow-y-auto p-4">
+		<div class="col-span-8 border-r border-border overflow-y-auto p-4">
 			<div class="space-y-4">
 				<!-- Buscador y filtros -->
 				<div class="flex gap-4">
@@ -309,12 +309,12 @@
 							{#if item.imagen_url}
 								<img src={item.imagen_url} alt={item.nombre} class="w-full h-32 object-cover rounded mb-2" />
 							{:else}
-								<div class="w-full h-32 bg-surface-300-600-token rounded mb-2 flex items-center justify-center text-4xl">
+								<div class="w-full h-32 bg-muted rounded mb-2 flex items-center justify-center text-4xl">
 									🍽️
 								</div>
 							{/if}
 							<h4 class="font-semibold mb-1">{item.nombre}</h4>
-							<p class="text-sm text-surface-600-300-token mb-2 flex-1">
+							<p class="text-sm text-muted-foreground mb-2 flex-1">
 								{item.descripcion || ''}
 							</p>
 							<p class="text-xl font-bold text-primary-500">S/ {item.precio.toFixed(2)}</p>
@@ -325,14 +325,14 @@
 		</div>
 
 		<!-- Order Summary (derecha) -->
-		<div class="col-span-4 bg-surface-100-800-token flex flex-col h-full">
+		<div class="col-span-4 bg-sidebar flex flex-col h-full">
 			<!-- Header -->
-			<div class="p-4 border-b border-surface-300-600-token">
+			<div class="p-4 border-b border-border">
 				<button class="btn btn-sm variant-ghost-surface mb-4" on:click={backToTables}>
 					◀ Volver a Mesas
 				</button>
 				<h3 class="h3">Mesa {currentTable?.numero || ''}</h3>
-				<p class="text-sm text-surface-600-300-token">
+				<p class="text-sm text-muted-foreground">
 					Zona: {currentTable?.zona?.nombre || ''}
 				</p>
 			</div>
@@ -340,7 +340,7 @@
 			<!-- Items list -->
 			<div class="flex-1 overflow-y-auto p-4">
 				{#if orderItems.length === 0}
-					<div class="text-center text-surface-600-300-token py-12">
+					<div class="text-center text-muted-foreground py-12">
 						<p class="text-4xl mb-2">🛒</p>
 						<p>Agregue items del menú</p>
 					</div>
@@ -372,7 +372,7 @@
 			</div>
 
 			<!-- Footer con total y acciones -->
-			<div class="p-4 border-t border-surface-300-600-token space-y-4">
+			<div class="p-4 border-t border-border space-y-4">
 				<div class="flex justify-between items-center text-2xl font-bold">
 					<span>TOTAL:</span>
 					<span>S/ {getOrderTotal().toFixed(2)}</span>
@@ -462,3 +462,4 @@
 		</button>
 	</div>
 </Modal>
+

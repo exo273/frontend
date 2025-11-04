@@ -68,7 +68,7 @@
 	<!-- Header -->
 	<div>
 		<h1 class="h1">Dashboard</h1>
-		<p class="text-surface-600-300-token">Resumen general del sistema</p>
+		<p class="text-muted-foreground">Resumen general del sistema</p>
 	</div>
 
 	{#if loading}
@@ -82,7 +82,7 @@
 			<div class="card p-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm text-surface-600-300-token">Productos</p>
+						<p class="text-sm text-muted-foreground">Productos</p>
 						<h3 class="text-3xl font-bold">{stats.productos_totales}</h3>
 						{#if stats.productos_stock_bajo > 0}
 							<p class="text-sm text-warning-500 mt-1">
@@ -98,7 +98,7 @@
 			<div class="card p-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm text-surface-600-300-token">Proveedores Activos</p>
+						<p class="text-sm text-muted-foreground">Proveedores Activos</p>
 						<h3 class="text-3xl font-bold">{stats.proveedores_activos}</h3>
 					</div>
 					<div class="text-5xl">🚚</div>
@@ -109,7 +109,7 @@
 			<div class="card p-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm text-surface-600-300-token">Items en el Menú</p>
+						<p class="text-sm text-muted-foreground">Items en el Menú</p>
 						<h3 class="text-3xl font-bold">{stats.items_menu}</h3>
 					</div>
 					<div class="text-5xl">📋</div>
@@ -120,7 +120,7 @@
 			<div class="card p-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm text-surface-600-300-token">Órdenes Hoy</p>
+						<p class="text-sm text-muted-foreground">Órdenes Hoy</p>
 						<h3 class="text-3xl font-bold">{stats.ordenes_hoy}</h3>
 					</div>
 					<div class="text-5xl">🧾</div>
@@ -131,7 +131,7 @@
 			<div class="card p-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm text-surface-600-300-token">Ventas Hoy</p>
+						<p class="text-sm text-muted-foreground">Ventas Hoy</p>
 						<h3 class="text-3xl font-bold">{formatCurrency(stats.ventas_hoy)}</h3>
 					</div>
 					<div class="text-5xl">💰</div>
@@ -148,16 +148,16 @@
 				</header>
 				<section class="p-4">
 					{#if lowStockProducts.length === 0}
-						<p class="text-center text-surface-600-300-token py-8">
+						<p class="text-center text-muted-foreground py-8">
 							✅ No hay productos con stock bajo
 						</p>
 					{:else}
 						<div class="space-y-3">
 							{#each lowStockProducts as product}
-								<div class="flex justify-between items-center p-3 bg-surface-100-800-token rounded-token">
+								<div class="flex justify-between items-center p-3 bg-sidebar rounded-md">
 									<div>
 										<p class="font-semibold">{product.nombre}</p>
-										<p class="text-sm text-surface-600-300-token">
+										<p class="text-sm text-muted-foreground">
 											Stock: {product.cantidad_actual} {product.unidad}
 										</p>
 									</div>
@@ -200,3 +200,4 @@
 		</div>
 	{/if}
 </div>
+

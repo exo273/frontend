@@ -10,7 +10,7 @@
 	<div>
 		<h1 class="h2">{title}</h1>
 		{#if subtitle}
-			<p class="text-surface-600-300-token">{subtitle}</p>
+			<p class="text-muted-foreground">{subtitle}</p>
 		{/if}
 	</div>
 	
@@ -24,3 +24,5 @@
 		</button>
 	{/if}
 </header>
+
+

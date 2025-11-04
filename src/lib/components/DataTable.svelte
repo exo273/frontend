@@ -14,7 +14,7 @@
 			<span class="ml-4">Cargando...</span>
 		</div>
 	{:else if data.length === 0}
-		<div class="text-center p-8 text-surface-600-300-token">
+		<div class="text-center p-8 text-muted-foreground">
 			<p class="text-lg">📭</p>
 			<p>{emptyMessage}</p>
 		</div>
@@ -77,3 +77,5 @@
 		</table>
 	{/if}
 </div>
+
+
