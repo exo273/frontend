@@ -31,32 +31,33 @@
 		try {
 			// Cargar estadísticas básicas
 			const [productos, proveedores, menuItems] = await Promise.all([
-				apiService.getProductos({ page_size: 1000 }),
-				apiService.getSuppliers({ activo: true }),
-				apiService.getMenuItems()
+				apiService.getProductos({ page_size: 1000 }).catch(() => ({ results: [], count: 0 })),
+				apiService.getSuppliers({ activo: true }).catch(() => ({ results: [], count: 0 })),
+				apiService.getMenuItems().catch(() => ({ results: [], count: 0 }))
 			]);
 
-			stats.productos_totales = productos.count || productos.length;
-			stats.productos_stock_bajo = productos.results
-				? productos.results.filter((p) => p.cantidad_actual <= (p.stock_minimo || 0)).length
-				: 0;
-			stats.proveedores_activos = proveedores.count || proveedores.length;
-			stats.items_menu = menuItems.count || menuItems.length;
+			// Manejar diferentes formatos de respuesta
+			const productosArray = productos.results || productos || [];
+			const proveedoresArray = proveedores.results || proveedores || [];
+			const menuItemsArray = menuItems.results || menuItems || [];
+
+			stats.productos_totales = productos.count ?? productosArray.length ?? 0;
+			stats.productos_stock_bajo = productosArray.filter((p) => p.cantidad_actual <= (p.stock_minimo || 0)).length || 0;
+			stats.proveedores_activos = proveedores.count ?? proveedoresArray.length ?? 0;
+			stats.items_menu = menuItems.count ?? menuItemsArray.length ?? 0;
 
 			// Productos con stock bajo
-			lowStockProducts = productos.results
-				? productos.results
-						.filter((p) => p.cantidad_actual <= (p.stock_minimo || 0))
-						.slice(0, 5)
-				: [];
+			lowStockProducts = productosArray
+				.filter((p) => p.cantidad_actual <= (p.stock_minimo || 0))
+				.slice(0, 5);
 
 			// Órdenes recientes (simulado - en producción vendría del backend)
 			// stats.ordenes_hoy = ...
 			// stats.ventas_hoy = ...
 			// recentOrders = ...
 		} catch (error) {
+			console.error('Error al cargar datos del dashboard:', error);
 			toast.error('Error al cargar datos del dashboard');
-			console.error(error);
 		} finally {
 			loading = false;
 		}
@@ -95,7 +96,7 @@
 					<Package class="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div class="text-2xl font-bold">{stats.productos_totales}</div>
+					<div class="text-2xl font-bold">{stats.productos_totales || 0}</div>
 					{#if stats.productos_stock_bajo > 0}
 						<p class="text-xs text-destructive mt-1">
 							{stats.productos_stock_bajo} con stock bajo
@@ -115,7 +116,7 @@
 					<Users class="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div class="text-2xl font-bold">{stats.proveedores_activos}</div>
+					<div class="text-2xl font-bold">{stats.proveedores_activos || 0}</div>
 					<p class="text-xs text-muted-foreground mt-1">
 						Total registrados
 					</p>
@@ -129,7 +130,7 @@
 					<FileText class="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div class="text-2xl font-bold">{stats.items_menu}</div>
+					<div class="text-2xl font-bold">{stats.items_menu || 0}</div>
 					<p class="text-xs text-muted-foreground mt-1">
 						Disponibles
 					</p>
@@ -143,7 +144,7 @@
 					<CalendarCheck class="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div class="text-2xl font-bold">{stats.ordenes_hoy}</div>
+					<div class="text-2xl font-bold">{stats.ordenes_hoy || 0}</div>
 					<p class="text-xs text-muted-foreground mt-1">
 						+0% desde ayer
 					</p>
