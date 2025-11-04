@@ -9,14 +9,13 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - VITE_USE_GATEWAY=${VITE_USE_GATEWAY:-true}
-      - VITE_API_GATEWAY_URL=${VITE_API_GATEWAY_URL}
+      - PORT=3000
+      - ORIGIN=https://alpha.kvernicola.cl
     ports:
-      - "5173:5173"
+      - "3000:3000"
     networks:
       - restaurant-network
 
 networks:
   restaurant-network:
-    driver: bridge
-    name: restaurant-network
+    external: true
