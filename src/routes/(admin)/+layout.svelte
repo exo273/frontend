@@ -4,8 +4,14 @@
 	import { page } from '$app/stores';
 	import { auth } from '$lib/stores';
 	import { apiService } from '$lib/api';
+	import LayoutDashboard from '$lib/components/icons/LayoutDashboard.svelte';
+	import Package from '$lib/components/icons/Package.svelte';
+	import Users from '$lib/components/icons/Users.svelte';
+	import ShoppingCart from '$lib/components/icons/ShoppingCart.svelte';
+	import Book from '$lib/components/icons/Book.svelte';
+	import FileText from '$lib/components/icons/FileText.svelte';
+	import LayoutGrid from '$lib/components/icons/LayoutGrid.svelte';
 
-	let sidebarOpen = true;
 	let currentUser = null;
 	let showUserMenu = false;
 
@@ -22,26 +28,14 @@
 		return unsubscribe;
 	});
 
-	// Menú de navegación
+	// Menú de navegación simplificado
 	const menuItems = [
-		{ label: 'Dashboard', icon: '📊', href: '/' },
-		{
-			label: 'Operaciones',
-			icon: '⚙️',
-			items: [
-				{ label: 'Inventario', icon: '📦', href: '/inventario' },
-				{ label: 'Proveedores', icon: '🚚', href: '/proveedores' },
-				{ label: 'Compras', icon: '🛒', href: '/compras' },
-				{ label: 'Recetas', icon: '📖', href: '/recetas' }
-			]
-		},
-		{
-			label: 'Gestión de Ventas',
-			icon: '💰',
-			items: [
-				{ label: 'Carta / Menú', icon: '📋', href: '/carta' }
-			]
-		}
+		{ label: 'Dashboard', icon: LayoutDashboard, href: '/' },
+		{ label: 'Inventario', icon: Package, href: '/inventario' },
+		{ label: 'Proveedores', icon: Users, href: '/proveedores' },
+		{ label: 'Compras', icon: ShoppingCart, href: '/compras' },
+		{ label: 'Recetas', icon: Book, href: '/recetas' },
+		{ label: 'Carta / Menú', icon: FileText, href: '/carta' }
 	];
 
 	function toggleSidebar() {
@@ -81,68 +75,29 @@
 
 <div class="flex h-screen overflow-hidden">
 	<!-- Sidebar -->
-	<aside
-		class="sidebar bg-sidebar border-r border-border transition-all duration-300 {sidebarOpen
-			? 'w-64'
-			: 'w-20'} flex flex-col"
-	>
+	<aside class="w-64 bg-sidebar border-r border-border flex flex-col">
 		<!-- Logo -->
-		<div class="p-4 border-b border-border">
-			{#if sidebarOpen}
-				<h2 class="font-bold text-xl">🍽️ SIG Restaurant</h2>
-			{:else}
-				<div class="text-center text-2xl">🍽️</div>
-			{/if}
+		<div class="p-6 border-b border-border">
+			<h2 class="font-bold text-xl">SIG Restaurant</h2>
 		</div>
 
 		<!-- Navigation -->
 		<nav class="flex-1 overflow-y-auto p-4">
-			<ul class="space-y-2">
+			<ul class="space-y-1">
 				{#each menuItems as item}
-					{#if item.items}
-						<!-- Grupo con subitems -->
-						<li class="mb-4">
-							<div class="text-xs font-semibold text-muted-foreground uppercase mb-2 {!sidebarOpen && 'text-center'}">
-								{sidebarOpen ? item.label : item.icon}
-							</div>
-							<ul class="space-y-1">
-								{#each item.items as subItem}
-									<li>
-										<a
-											href={subItem.href}
-											class="flex items-center gap-3 px-3 py-2 rounded-md transition-colors {isActive(
-												subItem.href
-											)
-												? 'variant-filled-primary'
-												: 'hover:variant-soft-surface'} {!sidebarOpen && 'justify-center'}"
-										>
-											<span class="text-xl">{subItem.icon}</span>
-											{#if sidebarOpen}
-												<span>{subItem.label}</span>
-											{/if}
-										</a>
-									</li>
-								{/each}
-							</ul>
-						</li>
-					{:else}
-						<!-- Item simple -->
-						<li>
-							<a
-								href={item.href}
-								class="flex items-center gap-3 px-3 py-2 rounded-md transition-colors {isActive(
-									item.href
-								)
-									? 'variant-filled-primary'
-									: 'hover:variant-soft-surface'} {!sidebarOpen && 'justify-center'}"
-							>
-								<span class="text-xl">{item.icon}</span>
-								{#if sidebarOpen}
-									<span>{item.label}</span>
-								{/if}
-							</a>
-						</li>
-					{/if}
+					<li>
+						<a
+							href={item.href}
+							class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {isActive(
+								item.href
+							)
+								? 'bg-accent text-accent-foreground'
+								: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}"
+						>
+							<svelte:component this={item.icon} class="h-4 w-4" />
+							<span class="text-sm font-medium">{item.label}</span>
+						</a>
+					</li>
 				{/each}
 			</ul>
 		</nav>
@@ -150,13 +105,11 @@
 		<!-- Botón POS -->
 		<div class="p-4 border-t border-border">
 			<button
-				class="btn variant-filled-secondary w-full {!sidebarOpen && 'btn-icon'}"
+				class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
 				on:click={launchPOS}
 			>
-				<span class="text-xl">🖥️</span>
-				{#if sidebarOpen}
-					<span>LANZAR POS</span>
-				{/if}
+				<svelte:component this={LayoutGrid} class="h-4 w-4" />
+				<span>LANZAR POS</span>
 			</button>
 		</div>
 	</aside>
@@ -165,54 +118,53 @@
 	<div class="flex-1 flex flex-col overflow-hidden">
 		<!-- Header -->
 		<header class="bg-sidebar border-b border-border px-6 py-4">
-			<div class="flex items-center justify-between">
-				<!-- Toggle sidebar -->
-				<button
-					class="btn btn-sm variant-ghost-surface"
-					on:click={toggleSidebar}
-					title={sidebarOpen ? 'Cerrar sidebar' : 'Abrir sidebar'}
-				>
-					<span class="text-xl">{sidebarOpen ? '◀' : '▶'}</span>
-				</button>
-
+			<div class="flex items-center justify-end">
 				<!-- User menu -->
 				<div class="relative">
 					<button
-						class="btn variant-ghost-surface flex items-center gap-2"
+						class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-accent transition-colors text-sm font-medium"
 						on:click={() => (showUserMenu = !showUserMenu)}
 					>
-						<span class="text-xl">👤</span>
+						<div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+							{#if currentUser}
+								{currentUser.username?.charAt(0).toUpperCase() || 'U'}
+							{:else}
+								U
+							{/if}
+						</div>
 						{#if currentUser}
 							<span class="hidden sm:inline">{currentUser.username}</span>
 						{/if}
-						<span class="text-xs">▼</span>
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
 					</button>
 
 					{#if showUserMenu}
 						<div
-							class="card absolute right-0 mt-2 w-48 p-2 z-10 shadow-xl"
+							class="absolute right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-lg z-10 overflow-hidden"
 							on:click={() => (showUserMenu = false)}
 							on:keydown={(e) => e.key === 'Escape' && (showUserMenu = false)}
 							role="button"
 							tabindex="-1"
 						>
-							<nav class="list-nav">
-								<ul>
-									{#if currentUser}
-										<li class="px-4 py-2 text-sm border-b border-border">
-											<div class="font-semibold">{currentUser.username}</div>
-											<div class="text-xs text-muted-foreground">
-												{currentUser.email || ''}
-											</div>
-										</li>
-									{/if}
-									<li>
-										<button class="w-full text-left px-4 py-2 hover:variant-soft-surface" on:click={handleLogout}>
-											🚪 Cerrar Sesión
-										</button>
-									</li>
-								</ul>
-							</nav>
+							{#if currentUser}
+								<div class="px-4 py-3 border-b border-border">
+									<div class="font-semibold text-sm">{currentUser.username}</div>
+									<div class="text-xs text-muted-foreground">
+										{currentUser.email || ''}
+									</div>
+								</div>
+							{/if}
+							<button 
+								class="w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2" 
+								on:click={handleLogout}
+							>
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+								</svg>
+								Cerrar Sesión
+							</button>
 						</div>
 					{/if}
 				</div>
@@ -233,13 +185,4 @@
 		}
 	}}
 />
-
-<style>
-	.sidebar {
-		height: 100vh;
-		position: sticky;
-		top: 0;
-	}
-</style>
-
 
