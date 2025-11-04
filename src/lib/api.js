@@ -189,45 +189,45 @@ export const apiService = {
 	// ===== Operaciones (Microservicio de Operaciones) =====
 
 	// Productos
-	getProductos: (params) => operacionesClient.get('/api/inventario/products/', params),
-	createProducto: (data) => operacionesClient.post('/api/inventario/products/', data),
-	updateProducto: (id, data) => operacionesClient.patch(`/api/inventario/products/${id}/`, data),
-	deleteProducto: (id) => operacionesClient.delete(`/api/inventario/products/${id}/`),
-	adjustStock: (id, data) => operacionesClient.post(`/api/inventario/products/${id}/adjust_stock/`, data),
+	getProductos: (params) => operacionesClient.get('/api/operaciones/productos/', params),
+	createProducto: (data) => operacionesClient.post('/api/operaciones/productos/', data),
+	updateProducto: (id, data) => operacionesClient.patch(`/api/operaciones/productos/${id}/`, data),
+	deleteProducto: (id) => operacionesClient.delete(`/api/operaciones/productos/${id}/`),
+	adjustStock: (id, data) => operacionesClient.post(`/api/operaciones/productos/${id}/adjust_stock/`, data),
 
 	// Categorías
-	getCategorias: () => operacionesClient.get('/api/inventario/categories/'),
-	createCategoria: (data) => operacionesClient.post('/api/inventario/categories/', data),
+	getCategorias: () => operacionesClient.get('/api/operaciones/categorias/'),
+	createCategoria: (data) => operacionesClient.post('/api/operaciones/categorias/', data),
 
 	// Proveedores
-	getSuppliers: () => operacionesClient.get('/api/suppliers/suppliers/'),
-	createSupplier: (data) => operacionesClient.post('/api/suppliers/suppliers/', data),
-	updateSupplier: (id, data) => operacionesClient.patch(`/api/suppliers/suppliers/${id}/`, data),
-	deleteSupplier: (id) => operacionesClient.delete(`/api/suppliers/suppliers/${id}/`),
+	getSuppliers: () => operacionesClient.get('/api/operaciones/proveedores/'),
+	createSupplier: (data) => operacionesClient.post('/api/operaciones/proveedores/', data),
+	updateSupplier: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/${id}/`, data),
+	deleteSupplier: (id) => operacionesClient.delete(`/api/operaciones/proveedores/${id}/`),
 
 	// Compras
-	getPurchases: (params) => operacionesClient.get('/api/inventario/purchases/', params),
-	createPurchase: (data) => operacionesClient.post('/api/inventario/purchases/', data),
+	getPurchases: (params) => operacionesClient.get('/api/operaciones/compras/', params),
+	createPurchase: (data) => operacionesClient.post('/api/operaciones/compras/', data),
 
 	// Recetas
-	getRecetas: () => operacionesClient.get('/api/recetas/recipes/'),
-	createReceta: (data) => operacionesClient.post('/api/recetas/recipes/', data),
-	updateReceta: (id, data) => operacionesClient.patch(`/api/recetas/recipes/${id}/`, data),
-	deleteReceta: (id) => operacionesClient.delete(`/api/recetas/recipes/${id}/`),
+	getRecetas: () => operacionesClient.get('/api/operaciones/recetas/'),
+	createReceta: (data) => operacionesClient.post('/api/operaciones/recetas/', data),
+	updateReceta: (id, data) => operacionesClient.patch(`/api/operaciones/recetas/${id}/`, data),
+	deleteReceta: (id) => operacionesClient.delete(`/api/operaciones/recetas/${id}/`),
 
 	// Menú (POS)
-	getMenuCategories: () => operacionesClient.get('/api/menu/categories/'),
-	getMenuItems: (params) => operacionesClient.get('/api/menu/items/', params),
-	getMenuItemsAvailable: () => operacionesClient.get('/api/menu/items/available/'),
-	createMenuItem: (data) => operacionesClient.post('/api/menu/items/', data),
-	updateMenuItem: (id, data) => operacionesClient.patch(`/api/menu/items/${id}/`, data),
-	recalculateCost: (id) => operacionesClient.post(`/api/menu/items/${id}/recalculate_cost/`, {}),
+	getMenuCategories: () => operacionesClient.get('/api/operaciones/menu-categorias/'),
+	getMenuItems: (params) => operacionesClient.get('/api/operaciones/menu-items/', params),
+	getMenuItemsAvailable: () => operacionesClient.get('/api/operaciones/menu-items/available/'),
+	createMenuItem: (data) => operacionesClient.post('/api/operaciones/menu-items/', data),
+	updateMenuItem: (id, data) => operacionesClient.patch(`/api/operaciones/menu-items/${id}/`, data),
+	recalculateCost: (id) => operacionesClient.post(`/api/operaciones/menu-items/${id}/recalculate_cost/`, {}),
 
 	// Mesas y Zonas
-	getZones: () => operacionesClient.get('/api/zones/'),
-	getTables: (params) => operacionesClient.get('/api/tables/', params),
-	updateTableStatus: (id, status) => operacionesClient.post(`/api/tables/${id}/update_status/`, { status }),
-	getTablesSummary: () => operacionesClient.get('/api/tables/status_summary/'),
+	getZones: () => operacionesClient.get('/api/operaciones/zonas/'),
+	getTables: (params) => operacionesClient.get('/api/operaciones/mesas/', params),
+	updateTableStatus: (id, status) => operacionesClient.post(`/api/operaciones/mesas/${id}/update_status/`, { status }),
+	getTablesSummary: () => operacionesClient.get('/api/operaciones/mesas/status_summary/'),
 
 	// Órdenes
 	getOrders: (params) => operacionesClient.get('/api/orders/orders/', params),
