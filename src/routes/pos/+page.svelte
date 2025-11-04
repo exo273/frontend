@@ -21,6 +21,7 @@
 	let selectedTable = null;
 	let showOrderModal = false;
 	let showEditTableModal = false;
+	let showPaymentModal = false;
 	let searchQuery = '';
 	let selectedCategory = '';
 
