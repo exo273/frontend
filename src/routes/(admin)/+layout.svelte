@@ -11,13 +11,14 @@
 	import Book from '$lib/components/icons/Book.svelte';
 	import FileText from '$lib/components/icons/FileText.svelte';
 	import LayoutGrid from '$lib/components/icons/LayoutGrid.svelte';
+	import Settings from '$lib/components/icons/Settings.svelte';
 
 	let currentUser = null;
 	let showUserMenu = false;
 
 	// Verificar autenticación
 	onMount(() => {
-		const unsubscribe = auth.subscribe((state) => {		JWT_SECRET_KEY=KQhzCHBjftXcBfJAjjU6c6cPtSjU5XpM
+		const unsubscribe = auth.subscribe((state) => {
 			if (!state.isAuthenticated) {
 				goto('/login');
 			} else {
@@ -35,7 +36,8 @@
 		{ label: 'Proveedores', icon: Users, href: '/proveedores' },
 		{ label: 'Compras', icon: ShoppingCart, href: '/compras' },
 		{ label: 'Recetas', icon: Book, href: '/recetas' },
-		{ label: 'Carta / Menú', icon: FileText, href: '/carta' }
+		{ label: 'Carta / Menú', icon: FileText, href: '/carta' },
+		{ label: 'Configuración', icon: Settings, href: '/configuracion' }
 	];
 
 	function toggleSidebar() {
