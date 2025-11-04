@@ -48,7 +48,7 @@
 		.join(' ');
 </script>
 
-<button {type} {disabled} disabled={isLoading || disabled} class={classes} on:click {...$$restProps}>
+<button {type} disabled={isLoading || disabled} class={classes} on:click {...$$restProps}>
 	{#if isLoading}
 		<svg
 			class="animate-spin h-4 w-4"
