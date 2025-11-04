@@ -10,6 +10,8 @@
 	import ShoppingCart from '$lib/components/icons/ShoppingCart.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Truck from '$lib/components/icons/Truck.svelte';
+	import Package from '$lib/components/icons/Package.svelte';
+	import X from '$lib/components/icons/X.svelte';
 
 	let compras = [];
 	let loading = false;
