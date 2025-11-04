@@ -216,12 +216,16 @@ export const apiService = {
 	deleteReceta: (id) => operacionesClient.delete(`/api/operaciones/recetas/${id}/`),
 
 	// Menú (POS)
-	getMenuCategories: () => operacionesClient.get('/api/operaciones/menu-categorias/'),
-	getMenuItems: (params) => operacionesClient.get('/api/operaciones/menu-items/', params),
-	getMenuItemsAvailable: () => operacionesClient.get('/api/operaciones/menu-items/available/'),
-	createMenuItem: (data) => operacionesClient.post('/api/operaciones/menu-items/', data),
-	updateMenuItem: (id, data) => operacionesClient.patch(`/api/operaciones/menu-items/${id}/`, data),
-	recalculateCost: (id) => operacionesClient.post(`/api/operaciones/menu-items/${id}/recalculate_cost/`, {}),
+	getMenuCategories: () => posClient.get('/api/pos/menu/categories/'),
+	getMenuItems: (params) => posClient.get('/api/pos/menu/items/', params),
+	getMenuItemsAvailable: () => posClient.get('/api/pos/menu/items/available/'),
+	createMenuItem: (data) => posClient.post('/api/pos/menu/items/', data),
+	updateMenuItem: (id, data) => posClient.patch(`/api/pos/menu/items/${id}/`, data),
+	deleteMenuItem: (id) => posClient.delete(`/api/pos/menu/items/${id}/`),
+	recalculateCost: (id) => posClient.post(`/api/pos/menu/items/${id}/recalculate_cost/`, {}),
+	createMenuCategory: (data) => posClient.post('/api/pos/menu/categories/', data),
+	updateMenuCategory: (id, data) => posClient.patch(`/api/pos/menu/categories/${id}/`, data),
+	deleteMenuCategory: (id) => posClient.delete(`/api/pos/menu/categories/${id}/`),
 
 	// Mesas y Zonas
 	getZones: () => operacionesClient.get('/api/operaciones/zonas/'),
