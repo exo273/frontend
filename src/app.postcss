@@ -81,11 +81,167 @@ body {
 
 /* Estilos personalizados */
 .table-interactive {
-	@apply cursor-pointer hover:bg-muted;
+	@apply cursor-pointer hover:bg-muted transition-colors duration-150;
 }
 
 .card-hover {
 	@apply transition-all duration-200 hover:scale-[1.02] hover:shadow-lg;
+}
+
+/* Animaciones de entrada/salida */
+@keyframes animate-in {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes animate-out {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes zoom-in {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes slide-in-from-top {
+	from {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slide-in-from-bottom {
+	from {
+		transform: translateY(10px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slide-in-from-left {
+	from {
+		transform: translateX(-10px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slide-in-from-right {
+	from {
+		transform: translateX(10px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+/* Clases de animación */
+.animate-in {
+	animation: animate-in 0.2s ease-out;
+}
+
+.animate-out {
+	animation: animate-out 0.2s ease-in;
+}
+
+.fade-in-0 {
+	animation: fade-in 0.15s ease-out;
+}
+
+.fade-out-0 {
+	animation: fade-out 0.15s ease-in;
+}
+
+.zoom-in-95 {
+	animation: zoom-in 0.2s ease-out;
+}
+
+.zoom-out-95 {
+	animation: animate-out 0.2s ease-in;
+}
+
+.slide-in-from-top-2 {
+	animation: slide-in-from-top 0.2s ease-out;
+}
+
+.slide-in-from-bottom-2 {
+	animation: slide-in-from-bottom 0.2s ease-out;
+}
+
+.slide-in-from-left-1\/2 {
+	animation: slide-in-from-left 0.2s ease-out;
+}
+
+.slide-in-from-right-1\/2 {
+	animation: slide-in-from-right 0.2s ease-out;
+}
+
+/* Transiciones suaves */
+.transition-colors {
+	transition-property: color, background-color, border-color;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+.transition-transform {
+	transition-property: transform;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+.transition-all {
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
 }
 
 /* Scrollbar personalizado */
@@ -104,33 +260,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
 	@apply bg-muted-foreground/50;
-}
-
-/* Animaciones */
-@keyframes slide-in {
-	from {
-		transform: translateX(100%);
-	}
-	to {
-		transform: translateX(0);
-	}
-}
-
-.slide-in {
-	animation: slide-in 0.3s ease-out;
-}
-
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-.fade-in {
-	animation: fade-in 0.2s ease-out;
 }
 
 /* Estilos para el POS */
