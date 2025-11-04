@@ -29,6 +29,13 @@
 	let orderItems = [];
 	let currentOrder = null;
 
+	// Payment data
+	let paymentData = {
+		metodo: 'efectivo',
+		monto: 0,
+		referencia: ''
+	};
+
 	// Edit table state
 	let editingTable = null;
 	let draggedTable = null;
