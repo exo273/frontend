@@ -250,12 +250,11 @@
 </div>
 
 <!-- Modal Nueva Compra -->
-{#if showModal}
-	<Dialog open={showModal} onClose={() => (showModal = false)}>
-		<div class="space-y-6">
-			<div>
-				<h2 class="text-lg font-semibold">Registrar Nueva Compra</h2>
-			</div>
+<Dialog bind:open={showModal}>
+	<div class="space-y-6">
+		<div>
+			<h2 class="text-lg font-semibold">Registrar Nueva Compra</h2>
+		</div>
 
 			<form on:submit|preventDefault={handleSubmit} class="space-y-6">
 				<!-- Información de la compra -->
@@ -399,4 +398,3 @@
 			</form>
 		</div>
 	</Dialog>
-{/if}

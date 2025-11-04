@@ -17,7 +17,7 @@
 
 	// Verificar autenticación
 	onMount(() => {
-		const unsubscribe = auth.subscribe((state) => {
+		const unsubscribe = auth.subscribe((state) => {		JWT_SECRET_KEY=KQhzCHBjftXcBfJAjjU6c6cPtSjU5XpM
 			if (!state.isAuthenticated) {
 				goto('/login');
 			} else {
@@ -69,7 +69,12 @@
 	}
 
 	function isActive(href) {
-		return $page.url.pathname === href;
+		// Si es la ruta raíz, solo activar si estamos exactamente en "/"
+		if (href === '/') {
+			return $page.url.pathname === '/';
+		}
+		// Para otras rutas, activar si la ruta actual comienza con el href
+		return $page.url.pathname.startsWith(href);
 	}
 </script>
 
