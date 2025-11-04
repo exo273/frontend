@@ -2,10 +2,21 @@
 	import { onMount } from 'svelte';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import DataTable from '$lib/components/DataTable.svelte';
-	import SearchBar from '$lib/components/SearchBar.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import CardHeader from '$lib/components/ui/CardHeader.svelte';
+	import CardTitle from '$lib/components/ui/CardTitle.svelte';
+	import CardContent from '$lib/components/ui/CardContent.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Package from '$lib/components/icons/Package.svelte';
+	import Plus from '$lib/components/icons/Plus.svelte';
+	import Edit from '$lib/components/icons/Edit.svelte';
+	import TrendingUp from '$lib/components/icons/TrendingUp.svelte';
+	import TrendingDown from '$lib/components/icons/TrendingDown.svelte';
+	import AlertTriangle from '$lib/components/icons/AlertTriangle.svelte';
+	import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
 	let productos = [];
 	let loading = false;
@@ -35,7 +46,7 @@
 		razon: ''
 	};
 
-	// Columnas de la tabla
+	// Columnas de la tabla - sin emojis
 	const columns = [
 		{ key: 'nombre', label: 'Producto' },
 		{ key: 'categoria', label: 'Categoría' },
@@ -58,28 +69,33 @@
 			align: 'right'
 		},
 		{
-			key: 'cantidad_actual',
+			key: 'status',
 			label: 'Estado',
-			format: (val, row) => {
-				if (val <= (row.stock_minimo || 0)) return '⚠️ Bajo';
-				if (val <= (row.stock_minimo || 0) * 1.5) return '⚡ Medio';
-				return '✅ OK';
-			},
 			align: 'center'
 		}
 	];
 
-	// Acciones de la tabla
+	// Estado del producto
+	function getStockStatus(producto) {
+		const cantidad = producto.cantidad_actual;
+		const minimo = producto.stock_minimo || 0;
+		
+		if (cantidad <= minimo) return { label: 'Bajo', variant: 'destructive' };
+		if (cantidad <= minimo * 1.5) return { label: 'Medio', variant: 'warning' };
+		return { label: 'OK', variant: 'success' };
+	}
+
+	// Acciones de la tabla - sin emojis
 	const actions = [
 		{
 			label: 'Ajustar',
-			icon: '📊',
+			icon: TrendingUp,
 			class: 'variant-ghost-primary',
 			onClick: openAjusteModal
 		},
 		{
 			label: 'Editar',
-			icon: '✏️',
+			icon: Edit,
 			class: 'variant-ghost-surface',
 			onClick: openEditModal
 		}
@@ -186,192 +202,241 @@
 </script>
 
 <div class="space-y-6">
-	<PageHeader
-		title="Inventario"
-		subtitle="Gestión de productos y stock"
-		buttonText="Nuevo Producto"
-		buttonIcon="➕"
-		onButtonClick={openCreateModal}
-	/>
+	<!-- Header -->
+	<div class="flex items-center justify-between">
+		<div>
+			<h1 class="text-3xl font-bold tracking-tight">Inventario</h1>
+			<p class="text-muted-foreground">Gestión de productos y stock</p>
+		</div>
+		<Button on:click={openCreateModal}>
+			<Plus class="h-4 w-4 mr-2" />
+			Nuevo Producto
+		</Button>
+	</div>
 
 	<!-- Filters -->
-	<div class="card p-4">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<SearchBar
-				bind:value={searchQuery}
-				placeholder="Buscar productos..."
-				onSearch={handleSearch}
-			/>
-			<select
-				bind:value={categoriaFilter}
-				on:change={loadProductos}
-				class="select"
-			>
-				<option value="">Todas las categorías</option>
-				{#each categorias as categoria}
-					<option value={categoria.id}>{categoria.nombre}</option>
-				{/each}
-			</select>
-		</div>
-	</div>
+	<Card>
+		<CardContent class="pt-6">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<Input
+					bind:value={searchQuery}
+					on:input={() => loadProductos()}
+					placeholder="Buscar productos..."
+					class="w-full"
+				/>
+				<select
+					bind:value={categoriaFilter}
+					on:change={loadProductos}
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+				>
+					<option value="">Todas las categorías</option>
+					{#each categorias as categoria}
+						<option value={categoria.id}>{categoria.nombre}</option>
+					{/each}
+				</select>
+			</div>
+		</CardContent>
+	</Card>
 
 	<!-- Tabla de productos -->
-	<div class="card">
-		<DataTable
-			{columns}
-			data={productos}
-			{actions}
-			{loading}
-			emptyMessage="No hay productos registrados"
-		/>
-	</div>
+	<Card>
+		<CardContent class="p-0">
+			{#if loading}
+				<div class="flex items-center justify-center py-8">
+					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+				</div>
+			{:else if productos.length === 0}
+				<div class="text-center py-12">
+					<Package class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+					<p class="text-muted-foreground">No hay productos registrados</p>
+				</div>
+			{:else}
+				<div class="overflow-x-auto">
+					<table class="w-full">
+						<thead>
+							<tr class="border-b border-border">
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Producto</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Categoría</th>
+								<th class="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Stock</th>
+								<th class="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Stock Mín.</th>
+								<th class="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Costo Prom.</th>
+								<th class="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Estado</th>
+								<th class="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each productos as producto}
+								{@const status = getStockStatus(producto)}
+								<tr class="border-b border-border hover:bg-accent transition-colors">
+									<td class="py-3 px-4 font-medium">{producto.nombre}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.categoria}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.cantidad_actual} {producto.unidad}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.stock_minimo || 0} {producto.unidad}</td>
+									<td class="py-3 px-4 text-right text-sm">S/ {producto.costo_promedio.toFixed(2)}</td>
+									<td class="py-3 px-4 text-center">
+										<Badge variant={status.variant}>{status.label}</Badge>
+									</td>
+									<td class="py-3 px-4 text-right">
+										<div class="flex items-center justify-end gap-2">
+											<Button variant="ghost" size="sm" on:click={() => openAjusteModal(producto)}>
+												<TrendingUp class="h-4 w-4" />
+											</Button>
+											<Button variant="ghost" size="sm" on:click={() => openEditModal(producto)}>
+												<Edit class="h-4 w-4" />
+											</Button>
+										</div>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</CardContent>
+	</Card>
 </div>
 
 <!-- Modal Crear/Editar Producto -->
-<Modal
-	bind:show={showModal}
-	title={modalMode === 'create' ? 'Nuevo Producto' : 'Editar Producto'}
-	size="md"
->
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<label class="label">
-			<span>Nombre *</span>
-			<input
-				type="text"
-				bind:value={formData.nombre}
-				required
-				class="input"
-				placeholder="Nombre del producto"
-			/>
-		</label>
-
-		<label class="label">
-			<span>Categoría *</span>
-			<select bind:value={formData.categoria} required class="select">
-				<option value="">Seleccione una categoría</option>
-				{#each categorias as categoria}
-					<option value={categoria.id}>{categoria.nombre}</option>
-				{/each}
-			</select>
-		</label>
-
-		<div class="grid grid-cols-2 gap-4">
-			<label class="label">
-				<span>Unidad *</span>
-				<select bind:value={formData.unidad} required class="select">
-					<option value="kg">Kilogramos (kg)</option>
-					<option value="gr">Gramos (gr)</option>
-					<option value="lt">Litros (lt)</option>
-					<option value="ml">Mililitros (ml)</option>
-					<option value="unidad">Unidades</option>
-				</select>
-			</label>
-
-			<label class="label">
-				<span>Stock Mínimo</span>
-				<input
-					type="number"
-					bind:value={formData.stock_minimo}
-					step="0.01"
-					min="0"
-					class="input"
-				/>
-			</label>
-		</div>
-
-		{#if modalMode === 'create'}
-			<div class="grid grid-cols-2 gap-4">
-				<label class="label">
-					<span>Cantidad Inicial</span>
-					<input
-						type="number"
-						bind:value={formData.cantidad_actual}
-						step="0.01"
-						min="0"
-						class="input"
-					/>
-				</label>
-
-				<label class="label">
-					<span>Costo Promedio</span>
-					<input
-						type="number"
-						bind:value={formData.costo_promedio}
-						step="0.01"
-						min="0"
-						class="input"
-						placeholder="S/ 0.00"
-					/>
-				</label>
+{#if showModal}
+	<Dialog open={showModal} onClose={() => (showModal = false)}>
+		<div class="space-y-6">
+			<div>
+				<h2 class="text-lg font-semibold">{modalMode === 'create' ? 'Nuevo Producto' : 'Editar Producto'}</h2>
 			</div>
-		{/if}
-	</form>
 
-	<div slot="footer" class="flex justify-end gap-2">
-		<button type="button" class="btn variant-ghost-surface" on:click={() => (showModal = false)}>
-			Cancelar
-		</button>
-		<button type="button" class="btn variant-filled-primary" on:click={handleSubmit}>
-			{modalMode === 'create' ? 'Crear' : 'Guardar'}
-		</button>
-	</div>
-</Modal>
+			<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Nombre *</label>
+					<Input
+						bind:value={formData.nombre}
+						required
+						placeholder="Nombre del producto"
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Categoría *</label>
+					<select bind:value={formData.categoria} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+						<option value="">Seleccione una categoría</option>
+						{#each categorias as categoria}
+							<option value={categoria.id}>{categoria.nombre}</option>
+						{/each}
+					</select>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Unidad *</label>
+						<select bind:value={formData.unidad} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+							<option value="kg">Kilogramos (kg)</option>
+							<option value="gr">Gramos (gr)</option>
+							<option value="lt">Litros (lt)</option>
+							<option value="ml">Mililitros (ml)</option>
+							<option value="unidad">Unidades</option>
+						</select>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Stock Mínimo</label>
+						<Input
+							type="number"
+							bind:value={formData.stock_minimo}
+							step="0.01"
+							min="0"
+						/>
+					</div>
+				</div>
+
+				{#if modalMode === 'create'}
+					<div class="grid grid-cols-2 gap-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium">Cantidad Inicial</label>
+							<Input
+								type="number"
+								bind:value={formData.cantidad_actual}
+								step="0.01"
+								min="0"
+							/>
+						</div>
+
+						<div class="space-y-2">
+							<label class="text-sm font-medium">Costo Promedio</label>
+							<Input
+								type="number"
+								bind:value={formData.costo_promedio}
+								step="0.01"
+								min="0"
+								placeholder="S/ 0.00"
+							/>
+						</div>
+					</div>
+				{/if}
+
+				<div class="flex justify-end gap-2 pt-4">
+					<Button type="button" variant="ghost" on:click={() => (showModal = false)}>
+						Cancelar
+					</Button>
+					<Button type="submit">
+						{modalMode === 'create' ? 'Crear' : 'Guardar'}
+					</Button>
+				</div>
+			</form>
+		</div>
+	</Dialog>
+{/if}
 
 <!-- Modal Ajustar Stock -->
-<Modal
-	bind:show={showAjusteModal}
-	title="Ajustar Stock: {selectedProducto?.nombre || ''}"
-	size="sm"
->
-	<form on:submit|preventDefault={handleAjuste} class="space-y-4">
-		<label class="label">
-			<span>Tipo de Ajuste *</span>
-			<select bind:value={ajusteData.tipo_ajuste} required class="select">
-				<option value="entrada">➕ Entrada (Agregar)</option>
-				<option value="salida">➖ Salida (Reducir)</option>
-			</select>
-		</label>
+{#if showAjusteModal}
+	<Dialog open={showAjusteModal} onClose={() => (showAjusteModal = false)}>
+		<div class="space-y-6">
+			<div>
+				<h2 class="text-lg font-semibold">Ajustar Stock: {selectedProducto?.nombre || ''}</h2>
+			</div>
 
-		<label class="label">
-			<span>Cantidad *</span>
-			<input
-				type="number"
-				bind:value={ajusteData.cantidad}
-				step="0.01"
-				min="0.01"
-				required
-				class="input"
-				placeholder="0.00"
-			/>
-			<small class="text-muted-foreground">
-				Stock actual: {selectedProducto?.cantidad_actual || 0}
-				{selectedProducto?.unidad || ''}
-			</small>
-		</label>
+			<form on:submit|preventDefault={handleAjuste} class="space-y-4">
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Tipo de Ajuste *</label>
+					<select bind:value={ajusteData.tipo_ajuste} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+						<option value="entrada">Entrada (Agregar)</option>
+						<option value="salida">Salida (Reducir)</option>
+					</select>
+				</div>
 
-		<label class="label">
-			<span>Razón del Ajuste *</span>
-			<textarea
-				bind:value={ajusteData.razon}
-				required
-				rows="3"
-				class="textarea"
-				placeholder="Explique el motivo del ajuste..."
-			/>
-		</label>
-	</form>
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Cantidad *</label>
+					<Input
+						type="number"
+						bind:value={ajusteData.cantidad}
+						step="0.01"
+						min="0.01"
+						required
+						placeholder="0.00"
+					/>
+					<p class="text-xs text-muted-foreground">
+						Stock actual: {selectedProducto?.cantidad_actual || 0} {selectedProducto?.unidad || ''}
+					</p>
+				</div>
 
-	<div slot="footer" class="flex justify-end gap-2">
-		<button
-			type="button"
-			class="btn variant-ghost-surface"
-			on:click={() => (showAjusteModal = false)}
-		>
-			Cancelar
-		</button>
-		<button type="button" class="btn variant-filled-primary" on:click={handleAjuste}>
-			Confirmar Ajuste
-		</button>
-	</div>
-</Modal>
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Razón del Ajuste *</label>
+					<textarea
+						bind:value={ajusteData.razon}
+						required
+						rows="3"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+						placeholder="Explique el motivo del ajuste..."
+					/>
+				</div>
 
+				<div class="flex justify-end gap-2 pt-4">
+					<Button type="button" variant="ghost" on:click={() => (showAjusteModal = false)}>
+						Cancelar
+					</Button>
+					<Button type="submit">
+						Confirmar Ajuste
+					</Button>
+				</div>
+			</form>
+		</div>
+	</Dialog>
+{/if}
