@@ -78,7 +78,7 @@
 	<aside class="w-64 bg-sidebar border-r border-border flex flex-col">
 		<!-- Logo -->
 		<div class="p-6 border-b border-border">
-			<h2 class="font-bold text-xl">SIG Restaurant</h2>
+			<h2 class="font-bold text-xl">SIGR</h2>
 		</div>
 
 		<!-- Navigation -->

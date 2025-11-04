@@ -2,6 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { auth, toast } from '$lib/stores';
 	import { apiService } from '$lib/api';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import CardHeader from '$lib/components/ui/CardHeader.svelte';
+	import CardTitle from '$lib/components/ui/CardTitle.svelte';
+	import CardContent from '$lib/components/ui/CardContent.svelte';
 
 	let email = '';
 	let password = '';
@@ -38,81 +44,76 @@
 </script>
 
 <svelte:head>
-	<title>Iniciar Sesión - Sistema de Restaurante</title>
+	<title>Iniciar Sesión - SIGR</title>
 </svelte:head>
 
-<div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-secondary-500">
-	<div class="card w-full max-w-md p-8 space-y-6 shadow-2xl">
-		<!-- Logo y Título -->
-		<div class="text-center space-y-2">
-			<div class="flex justify-center mb-4">
-				<div class="w-20 h-20 bg-primary-500 rounded-full flex items-center justify-center">
-					<span class="text-4xl">🍽️</span>
+<div class="min-h-screen w-full flex items-center justify-center bg-background p-4">
+	<Card class="w-full max-w-md">
+		<CardHeader class="space-y-1 text-center pb-4">
+			<div class="flex justify-center mb-6">
+				<div class="h-16 w-16 rounded-lg bg-primary/10 flex items-center justify-center">
+					<svg class="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+					</svg>
 				</div>
 			</div>
-			<h1 class="h2">Sistema de Gestión</h1>
-			<p class="text-muted-foreground">Restaurante</p>
-		</div>
+			<CardTitle class="text-2xl font-bold">SIGR</CardTitle>
+			<p class="text-sm text-muted-foreground">Sistema Integral de Gestión de Restaurantes</p>
+		</CardHeader>
 
-		<!-- Formulario -->
-		<form on:submit|preventDefault={handleLogin} class="space-y-4">
-			<!-- Email -->
-			<label class="label">
-				<span class="label-text">Email</span>
-				<input
-					type="email"
-					class="input"
-					placeholder="email@example.com"
-					bind:value={email}
-					on:keypress={handleKeyPress}
+		<CardContent>
+			<form on:submit|preventDefault={handleLogin} class="space-y-4">
+				<!-- Email -->
+				<div class="space-y-2">
+					<label class="text-sm font-medium" for="email">Email</label>
+					<Input
+						id="email"
+						type="email"
+						placeholder="email@example.com"
+						bind:value={email}
+						on:keypress={handleKeyPress}
+						disabled={loading}
+						required
+					/>
+				</div>
+
+				<!-- Contraseña -->
+				<div class="space-y-2">
+					<label class="text-sm font-medium" for="password">Contraseña</label>
+					<Input
+						id="password"
+						type="password"
+						placeholder="••••••••"
+						bind:value={password}
+						on:keypress={handleKeyPress}
+						disabled={loading}
+						required
+					/>
+				</div>
+
+				<!-- Botón de Login -->
+				<Button
+					type="submit"
+					class="w-full"
 					disabled={loading}
-					required
-					autocomplete="email"
-				/>
-			</label>
+				>
+					{#if loading}
+						<div class="flex items-center justify-center gap-2">
+							<div class="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></div>
+							<span>Iniciando sesión...</span>
+						</div>
+					{:else}
+						Iniciar Sesión
+					{/if}
+				</Button>
+			</form>
 
-			<!-- Contraseña -->
-			<label class="label">
-				<span class="label-text">Contraseña</span>
-				<input
-					type="password"
-					class="input"
-					placeholder="Ingresa tu contraseña"
-					bind:value={password}
-					on:keypress={handleKeyPress}
-					disabled={loading}
-					required
-					autocomplete="current-password"
-				/>
-			</label>
-
-			<!-- Botón de Login -->
-			<button
-				type="submit"
-				class="btn variant-filled-primary w-full"
-				disabled={loading}
-			>
-				{#if loading}
-					<span class="animate-spin">⏳</span>
-					<span>Iniciando sesión...</span>
-				{:else}
-					<span>🔓</span>
-					<span>Iniciar Sesión</span>
-				{/if}
-			</button>
-		</form>
-
-		<!-- Footer -->
-		<div class="text-center text-sm text-muted-foreground">
-			<p>© 2024 Sistema de Gestión de Restaurantes</p>
-		</div>
-	</div>
+			<!-- Footer -->
+			<div class="mt-6 text-center">
+				<p class="text-xs text-muted-foreground">
+					© 2024 SIGR - Todos los derechos reservados
+				</p>
+			</div>
+		</CardContent>
+	</Card>
 </div>
-
-<style>
-	:global(body) {
-		overflow: hidden;
-	}
-</style>
-
-

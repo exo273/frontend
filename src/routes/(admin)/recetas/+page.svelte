@@ -208,6 +208,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Recetas - SIGR</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<PageHeader
 		title="Recetas"

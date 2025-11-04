@@ -219,6 +219,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Carta/Menú - SIGR</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<PageHeader
 		title="Carta / Menú"

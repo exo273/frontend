@@ -70,6 +70,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Dashboard - SIGR</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<!-- Header -->
 	<div>
