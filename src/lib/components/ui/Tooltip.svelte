@@ -29,7 +29,14 @@
 </script>
 
 <div class={cn('relative inline-block', className)} {...$$restProps}>
-	<div on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave}>
+	<div 
+		role="button"
+		tabindex="0"
+		on:mouseenter={handleMouseEnter} 
+		on:mouseleave={handleMouseLeave}
+		on:focus={handleMouseEnter}
+		on:blur={handleMouseLeave}
+	>
 		<slot />
 	</div>
 
