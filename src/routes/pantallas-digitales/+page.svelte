@@ -1,5 +1,4 @@
 <script>
-	import { Card, Button } from '@skeletonlabs/skeleton';
 	import { clipboard } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	
@@ -68,7 +67,7 @@
 	
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 		<!-- Card principal: URL de la TV -->
-		<Card class="p-6 space-y-4">
+		<div class="p-6 space-y-4">
 			<header class="card-header">
 				<h2 class="h2">Señalización de Menú (TV)</h2>
 			</header>
@@ -92,7 +91,7 @@
 							value={tvUrl}
 							readonly
 						/>
-						<button
+						<button 
 							class="variant-filled-primary"
 							on:click={copyToClipboard}
 							disabled={copied}
@@ -115,7 +114,7 @@
 				
 				<!-- Botón para forzar actualización -->
 				<div class="flex justify-between items-center pt-4">
-					<Button
+					<button 
 						on:click={forceRefresh}
 						disabled={refreshing}
 						class="variant-ghost-secondary"
@@ -132,13 +131,13 @@
 							</svg>
 							Forzar Actualización
 						{/if}
-					</Button>
+					</button>
 				</div>
 			</section>
-		</Card>
+		</div>
 		
 		<!-- Card de instrucciones -->
-		<Card class="p-6 space-y-4">
+		<div class="p-6 space-y-4">
 			<header class="card-header">
 				<h2 class="h2">Instrucciones de Configuración</h2>
 			</header>
@@ -183,11 +182,11 @@
 					</p>
 				</div>
 			</section>
-		</Card>
+		</div>
 	</div>
 	
 	<!-- Estadísticas o información adicional -->
-	<Card class="p-6">
+	<div class="p-6">
 		<header class="card-header">
 			<h2 class="h2">Estado del Sistema</h2>
 		</header>
@@ -206,7 +205,7 @@
 				<p class="text-surface-600-300-token">Pantallas Simultáneas</p>
 			</div>
 		</section>
-	</Card>
+	</div>
 </div>
 
 <style>
