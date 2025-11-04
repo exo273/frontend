@@ -279,117 +279,122 @@
 							<Input type="date" bind:value={formData.fecha_compra} required />
 						</div>
 
-				<label class="label">
-					<span>N° Factura</span>
-					<input
-						type="text"
-						bind:value={formData.numero_factura}
-						class="input"
-						placeholder="F001-00001234"
-					/>
-				</label>
-			</div>
-		</div>
-
-		<!-- Agregar productos -->
-		<div class="card variant-ghost-primary p-4 space-y-4">
-			<h4 class="h4">📦 Agregar Productos</h4>
-
-			<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-				<label class="label md:col-span-5">
-					<span>Producto</span>
-					<select bind:value={newItem.producto} class="select">
-						<option value="">Seleccione...</option>
-						{#each productos as producto}
-							<option value={producto.id}>{producto.nombre} ({producto.unidad})</option>
-						{/each}
-					</select>
-				</label>
-
-				<label class="label md:col-span-2">
-					<span>Cantidad</span>
-					<input type="number" bind:value={newItem.cantidad} step="0.01" min="0" class="input" />
-				</label>
-
-				<label class="label md:col-span-3">
-					<span>Costo Unitario</span>
-					<input
-						type="number"
-						bind:value={newItem.costo_unitario}
-						step="0.01"
-						min="0"
-						class="input"
-						placeholder="S/ 0.00"
-					/>
-				</label>
-
-				<div class="md:col-span-2">
-					<button type="button" class="btn variant-filled-primary w-full" on:click={addItem}>
-						➕ Agregar
-					</button>
+						<div class="space-y-2">
+							<label class="text-sm font-medium">N° Factura</label>
+							<Input
+								bind:value={formData.numero_factura}
+								placeholder="F001-00001234"
+							/>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
 
-		<!-- Lista de productos agregados -->
-		{#if formData.detalles.length > 0}
-			<div class="card p-4">
-				<h4 class="h4 mb-4">🛒 Productos en la Compra</h4>
-				<div class="table-container">
-					<table class="table table-compact">
-						<thead>
-							<tr>
-								<th>Producto</th>
-								<th class="text-right">Cantidad</th>
-								<th class="text-right">Costo Unit.</th>
-								<th class="text-right">Subtotal</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each formData.detalles as item, index}
-								<tr>
-									<td>{item.producto_nombre}</td>
-									<td class="text-right">{item.cantidad} {item.producto_unidad}</td>
-									<td class="text-right">S/ {item.costo_unitario.toFixed(2)}</td>
-									<td class="text-right font-semibold">S/ {item.subtotal.toFixed(2)}</td>
-									<td class="text-right">
-										<button
-											type="button"
-											class="btn btn-sm variant-ghost-error"
-											on:click={() => removeItem(index)}
-										>
-											🗑️
-										</button>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-						<tfoot>
-							<tr class="font-bold">
-								<td colspan="3" class="text-right">TOTAL:</td>
-								<td class="text-right text-xl">S/ {getTotal().toFixed(2)}</td>
-								<td></td>
-							</tr>
-						</tfoot>
-					</table>
+				<!-- Agregar productos -->
+				<div class="space-y-4">
+					<h4 class="text-sm font-semibold flex items-center gap-2">
+						<Package class="h-4 w-4" />
+						Agregar Productos
+					</h4>
+
+					<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+						<div class="space-y-2 md:col-span-5">
+							<label class="text-sm font-medium">Producto</label>
+							<select bind:value={newItem.producto} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+								<option value="">Seleccione...</option>
+								{#each productos as producto}
+									<option value={producto.id}>{producto.nombre} ({producto.unidad})</option>
+								{/each}
+							</select>
+						</div>
+
+						<div class="space-y-2 md:col-span-2">
+							<label class="text-sm font-medium">Cantidad</label>
+							<Input type="number" bind:value={newItem.cantidad} step="0.01" min="0" />
+						</div>
+
+						<div class="space-y-2 md:col-span-3">
+							<label class="text-sm font-medium">Costo Unit.</label>
+							<Input
+								type="number"
+								bind:value={newItem.costo_unitario}
+								step="0.01"
+								min="0"
+								placeholder="S/ 0.00"
+							/>
+						</div>
+
+						<div class="md:col-span-2">
+							<Button type="button" class="w-full" on:click={addItem}>
+								<Plus class="h-4 w-4 mr-2" />
+								Agregar
+							</Button>
+						</div>
+					</div>
 				</div>
-			</div>
-		{/if}
-	</form>
 
-	<div slot="footer" class="flex justify-end gap-2">
-		<button type="button" class="btn variant-ghost-surface" on:click={() => (showModal = false)}>
-			Cancelar
-		</button>
-		<button
-			type="button"
-			class="btn variant-filled-primary"
-			on:click={handleSubmit}
-			disabled={formData.detalles.length === 0}
-		>
-			💾 Registrar Compra
-		</button>
-	</div>
-</Modal>
+				<!-- Lista de productos agregados -->
+				{#if formData.detalles.length > 0}
+					<div class="space-y-4">
+						<h4 class="text-sm font-semibold flex items-center gap-2">
+							<ShoppingCart class="h-4 w-4" />
+							Productos en la Compra
+						</h4>
+						<div class="border rounded-lg overflow-hidden">
+							<table class="w-full">
+								<thead>
+									<tr class="border-b border-border bg-muted/50">
+										<th class="text-left py-2 px-4 text-sm font-medium">Producto</th>
+										<th class="text-right py-2 px-4 text-sm font-medium">Cantidad</th>
+										<th class="text-right py-2 px-4 text-sm font-medium">Costo Unit.</th>
+										<th class="text-right py-2 px-4 text-sm font-medium">Subtotal</th>
+										<th class="w-12"></th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each formData.detalles as item, index}
+										<tr class="border-b border-border">
+											<td class="py-2 px-4 text-sm">{item.producto_nombre}</td>
+											<td class="py-2 px-4 text-right text-sm">{item.cantidad} {item.producto_unidad}</td>
+											<td class="py-2 px-4 text-right text-sm">S/ {item.costo_unitario.toFixed(2)}</td>
+											<td class="py-2 px-4 text-right font-medium">S/ {item.subtotal.toFixed(2)}</td>
+											<td class="py-2 px-4 text-right">
+												<Button
+													type="button"
+													variant="ghost"
+													size="sm"
+													on:click={() => removeItem(index)}
+												>
+													<X class="h-4 w-4" />
+												</Button>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+								<tfoot>
+									<tr class="bg-muted/50">
+										<td colspan="3" class="py-3 px-4 text-right font-semibold">TOTAL:</td>
+										<td class="py-3 px-4 text-right text-lg font-bold">S/ {getTotal().toFixed(2)}</td>
+										<td></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				{/if}
 
+				<div class="flex justify-end gap-2 pt-4">
+					<Button type="button" variant="ghost" on:click={() => (showModal = false)}>
+						Cancelar
+					</Button>
+					<Button
+						type="button"
+						on:click={handleSubmit}
+						disabled={formData.detalles.length === 0}
+					>
+						Registrar Compra
+					</Button>
+				</div>
+			</form>
+		</div>
+	</Dialog>
+{/if}
