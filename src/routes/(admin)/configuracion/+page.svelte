@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { toast } from '$lib/stores';
+	import { apiService } from '$lib/api';
 	import Settings from '$lib/components/icons/Settings.svelte';
 	import Home from '$lib/components/icons/Home.svelte';
 	import Users from '$lib/components/icons/Users.svelte';
@@ -10,6 +11,13 @@
 	import Upload from '$lib/components/icons/Upload.svelte';
 	import Image from '$lib/components/icons/Image.svelte';
 	import Loader from '$lib/components/icons/Loader.svelte';
+	import Plus from '$lib/components/icons/Plus.svelte';
+	import Edit2 from '$lib/components/icons/Edit2.svelte';
+	import Trash2 from '$lib/components/icons/Trash2.svelte';
+	import UserModal from '$lib/components/configuracion/UserModal.svelte';
+	import RoleModal from '$lib/components/configuracion/RoleModal.svelte';
+	import PaymentMethodModal from '$lib/components/configuracion/PaymentMethodModal.svelte';
+	import PrinterModal from '$lib/components/configuracion/PrinterModal.svelte';
 
 	// Pestañas de configuración
 	const tabs = [
@@ -38,6 +46,27 @@
 
 	let logoPreview = null;
 	let receiptLogoPreview = null;
+
+	// Datos de usuarios y roles
+	let users = [];
+	let roles = [];
+	let userSubTab = 'users'; // 'users' o 'roles'
+	let showUserModal = false;
+	let showRoleModal = false;
+	let editingUser = null;
+	let editingRole = null;
+	let userModalMode = 'create';
+	let roleModalMode = 'create';
+
+	// Tab 3 - Métodos de Pago
+	let paymentMethods = [];
+	let showPaymentModal = false;
+	let editingPayment = null;
+
+	// Tab 4 - Impresoras
+	let printers = [];
+	let showPrinterModal = false;
+	let editingPrinter = null;
 
 	onMount(async () => {
 		await loadRestaurantConfig();
@@ -147,6 +176,453 @@
 
 	function selectTab(tabId) {
 		activeTab = tabId;
+		if (tabId === 'users') {
+			loadUsers();
+			loadRoles();
+		} else if (tabId === 'payments') {
+			loadPaymentMethods();
+		} else if (tabId === 'printers') {
+			loadPrinters();
+		}
+	}
+
+	// ============================================================================
+	// Funciones para Usuarios y Roles
+	// ============================================================================
+
+	async function loadUsers() {
+		try {
+			const response = await fetch('/api/auth/users/', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				users = await response.json();
+			}
+		} catch (error) {
+			console.error('Error al cargar usuarios:', error);
+		}
+	}
+
+	async function loadRoles() {
+		try {
+			const response = await fetch('/api/auth/roles/', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				roles = await response.json();
+			}
+		} catch (error) {
+			console.error('Error al cargar roles:', error);
+		}
+	}
+
+	function openUserModal(user = null) {
+		editingUser = user;
+		userModalMode = user ? 'edit' : 'create';
+		showUserModal = true;
+	}
+
+	async function handleUserSubmit(event) {
+		const data = event.detail;
+		saving = true;
+
+		try {
+			const formData = new FormData();
+			formData.append('email', data.email);
+			formData.append('first_name', data.first_name);
+			formData.append('last_name', data.last_name);
+			formData.append('phone', data.phone || '');
+			formData.append('role', data.role);
+			formData.append('is_active', data.is_active);
+
+			if (data.profile_image) {
+				formData.append('profile_image', data.profile_image);
+			}
+
+			if (userModalMode === 'create') {
+				formData.append('password', data.password);
+				formData.append('password2', data.password2);
+			}
+
+			const url =
+				userModalMode === 'create' ? '/api/auth/users/' : `/api/auth/users/${data.id}/`;
+			const method = userModalMode === 'create' ? 'POST' : 'PATCH';
+
+			const response = await fetch(url, {
+				method,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: formData
+			});
+
+			if (response.ok) {
+				toast.success(
+					userModalMode === 'create' ? 'Usuario creado exitosamente' : 'Usuario actualizado'
+				);
+				showUserModal = false;
+				await loadUsers();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al guardar usuario');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al guardar usuario');
+		} finally {
+			saving = false;
+		}
+	}
+
+	async function deleteUser(userId) {
+		if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+
+		try {
+			const response = await fetch(`/api/auth/users/${userId}/`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				toast.success('Usuario eliminado');
+				await loadUsers();
+			} else {
+				toast.error('Error al eliminar usuario');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al eliminar usuario');
+		}
+	}
+
+	function openRoleModal(role = null) {
+		editingRole = role;
+		roleModalMode = role ? 'edit' : 'create';
+		showRoleModal = true;
+	}
+
+	async function handleRoleSubmit(event) {
+		const data = event.detail;
+		saving = true;
+
+		try {
+			const url = roleModalMode === 'create' ? '/api/auth/roles/' : `/api/auth/roles/${data.id}/`;
+			const method = roleModalMode === 'create' ? 'POST' : 'PATCH';
+
+			const response = await fetch(url, {
+				method,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: JSON.stringify({
+					name: data.name,
+					description: data.description,
+					permissions: data.permissions
+				})
+			});
+
+			if (response.ok) {
+				toast.success(roleModalMode === 'create' ? 'Rol creado exitosamente' : 'Rol actualizado');
+				showRoleModal = false;
+				await loadRoles();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al guardar rol');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al guardar rol');
+		} finally {
+			saving = false;
+		}
+	}
+
+	async function deleteRole(roleId) {
+		if (!confirm('¿Estás seguro de eliminar este rol?')) return;
+
+		try {
+			const response = await fetch(`/api/auth/roles/${roleId}/`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				toast.success('Rol eliminado');
+				await loadRoles();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al eliminar rol');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al eliminar rol');
+		}
+	}
+
+	// ============================================================================
+	// Funciones para Métodos de Pago
+	// ============================================================================
+
+	async function loadPaymentMethods() {
+		loading = true;
+		try {
+			const response = await fetch('/api/pos/config/payment-methods/', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				paymentMethods = await response.json();
+			} else {
+				console.error('Error loading payment methods');
+				paymentMethods = [];
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			paymentMethods = [];
+		} finally {
+			loading = false;
+		}
+	}
+
+	function openPaymentModal(payment = null) {
+		editingPayment = payment;
+		showPaymentModal = true;
+	}
+
+	async function handleSavePayment(event) {
+		const paymentData = event.detail;
+		loading = true;
+
+		try {
+			const formData = new FormData();
+			formData.append('name', paymentData.name);
+			formData.append('description', paymentData.description || '');
+			formData.append('is_active', paymentData.is_active);
+
+			if (paymentData.logo) {
+				formData.append('logo', paymentData.logo);
+			}
+
+			const url = paymentData.id
+				? `/api/pos/config/payment-methods/${paymentData.id}/`
+				: '/api/pos/config/payment-methods/';
+
+			const method = paymentData.id ? 'PATCH' : 'POST';
+
+			const response = await fetch(url, {
+				method,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: formData
+			});
+
+			if (response.ok) {
+				toast.success(
+					paymentData.id ? 'Método de pago actualizado' : 'Método de pago creado'
+				);
+				showPaymentModal = false;
+				editingPayment = null;
+				await loadPaymentMethods();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al guardar método de pago');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al guardar método de pago');
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function deletePaymentMethod(paymentId) {
+		if (!confirm('¿Estás seguro de eliminar este método de pago?')) return;
+
+		try {
+			const response = await fetch(`/api/pos/config/payment-methods/${paymentId}/`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				toast.success('Método de pago eliminado');
+				await loadPaymentMethods();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al eliminar método de pago');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al eliminar método de pago');
+		}
+	}
+
+	async function togglePaymentActive(paymentId, currentState) {
+		try {
+			const response = await fetch(`/api/pos/config/payment-methods/${paymentId}/`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: JSON.stringify({ is_active: !currentState })
+			});
+
+			if (response.ok) {
+				toast.success('Estado actualizado');
+				await loadPaymentMethods();
+			} else {
+				toast.error('Error al actualizar estado');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al actualizar estado');
+		}
+	}
+
+	// ============================================================================
+	// Funciones para Impresoras
+	// ============================================================================
+
+	async function loadPrinters() {
+		loading = true;
+		try {
+			const response = await fetch('/api/pos/config/printers/', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				printers = await response.json();
+			} else {
+				console.error('Error loading printers');
+				printers = [];
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			printers = [];
+		} finally {
+			loading = false;
+		}
+	}
+
+	function openPrinterModal(printer = null) {
+		editingPrinter = printer;
+		showPrinterModal = true;
+	}
+
+	async function handleSavePrinter(event) {
+		const printerData = event.detail;
+		loading = true;
+
+		try {
+			const url = printerData.id
+				? `/api/pos/config/printers/${printerData.id}/`
+				: '/api/pos/config/printers/';
+
+			const method = printerData.id ? 'PATCH' : 'POST';
+
+			const body = {
+				name: printerData.name,
+				type: printerData.type,
+				connection_type: printerData.connection_type,
+				is_active: printerData.is_active
+			};
+
+			// Solo incluir campos de red si la conexión es por red
+			if (printerData.connection_type === 'network') {
+				body.ip_address = printerData.ip_address;
+				body.port = printerData.port;
+			}
+
+			const response = await fetch(url, {
+				method,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: JSON.stringify(body)
+			});
+
+			if (response.ok) {
+				toast.success(printerData.id ? 'Impresora actualizada' : 'Impresora creada');
+				showPrinterModal = false;
+				editingPrinter = null;
+				await loadPrinters();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al guardar impresora');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al guardar impresora');
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function deletePrinter(printerId) {
+		if (!confirm('¿Estás seguro de eliminar esta impresora?')) return;
+
+		try {
+			const response = await fetch(`/api/pos/config/printers/${printerId}/`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				}
+			});
+
+			if (response.ok) {
+				toast.success('Impresora eliminada');
+				await loadPrinters();
+			} else {
+				const error = await response.json();
+				toast.error(error.detail || 'Error al eliminar impresora');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al eliminar impresora');
+		}
+	}
+
+	async function togglePrinterActive(printerId, currentState) {
+		try {
+			const response = await fetch(`/api/pos/config/printers/${printerId}/`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+				},
+				body: JSON.stringify({ is_active: !currentState })
+			});
+
+			if (response.ok) {
+				toast.success('Estado actualizado');
+				await loadPrinters();
+			} else {
+				toast.error('Error al actualizar estado');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Error al actualizar estado');
+		}
 	}
 </script>
 
@@ -385,21 +861,448 @@
 					</div>
 				{:else if activeTab === 'users'}
 					<div class="p-6">
-						<h2 class="text-lg font-semibold mb-4">Usuarios y Roles</h2>
-						<p class="text-muted-foreground">Gestión de usuarios y permisos</p>
+						<!-- Sub-pestañas horizontales -->
+						<div class="flex gap-2 mb-6 border-b border-border">
+							<button
+								on:click={() => (userSubTab = 'users')}
+								class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {userSubTab ===
+								'users'
+									? 'border-primary text-primary'
+									: 'border-transparent text-muted-foreground hover:text-foreground'}"
+							>
+								Usuarios
+							</button>
+							<button
+								on:click={() => (userSubTab = 'roles')}
+								class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {userSubTab ===
+								'roles'
+									? 'border-primary text-primary'
+									: 'border-transparent text-muted-foreground hover:text-foreground'}"
+							>
+								Roles
+							</button>
+						</div>
+
+						{#if userSubTab === 'users'}
+							<!-- Tabla de Usuarios -->
+							<div class="mb-4 flex justify-between items-center">
+								<h3 class="text-base font-semibold">Usuarios del Sistema</h3>
+								<button
+									on:click={() => openUserModal()}
+									class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+								>
+									<Plus class="h-4 w-4" />
+									Invitar Usuario
+								</button>
+							</div>
+
+							<div class="border border-border rounded-lg overflow-hidden">
+								<table class="w-full">
+									<thead class="bg-muted">
+										<tr>
+											<th class="text-left p-3 text-sm font-medium">Usuario</th>
+											<th class="text-left p-3 text-sm font-medium">Email</th>
+											<th class="text-left p-3 text-sm font-medium">Rol</th>
+											<th class="text-left p-3 text-sm font-medium">Estado</th>
+											<th class="text-right p-3 text-sm font-medium">Acciones</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each users as user}
+											<tr class="border-t border-border hover:bg-muted/50">
+												<td class="p-3">
+													<div class="flex items-center gap-3">
+														{#if user.profile_image_url}
+															<img
+																src={user.profile_image_url}
+																alt={user.full_name}
+																class="h-10 w-10 rounded-full object-cover"
+															/>
+														{:else}
+															<div
+																class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold"
+															>
+																{user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
+															</div>
+														{/if}
+														<div>
+															<div class="font-medium">{user.full_name}</div>
+															<div class="text-xs text-muted-foreground">{user.phone || '-'}</div>
+														</div>
+													</div>
+												</td>
+												<td class="p-3 text-sm">{user.email}</td>
+												<td class="p-3 text-sm">
+													{#if user.role_detail}
+														<span
+															class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
+														>
+															{user.role_detail.name}
+														</span>
+													{:else}
+														<span class="text-muted-foreground">Sin rol</span>
+													{/if}
+												</td>
+												<td class="p-3 text-sm">
+													{#if user.is_active}
+														<span
+															class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-700 dark:text-green-400"
+														>
+															Activo
+														</span>
+													{:else}
+														<span
+															class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-700 dark:text-red-400"
+														>
+															Inactivo
+														</span>
+													{/if}
+												</td>
+												<td class="p-3">
+													<div class="flex items-center justify-end gap-2">
+														<button
+															on:click={() => openUserModal(user)}
+															class="p-2 hover:bg-accent rounded-lg transition-colors"
+															title="Editar"
+														>
+															<Edit2 class="h-4 w-4" />
+														</button>
+														<button
+															on:click={() => deleteUser(user.id)}
+															class="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+															title="Eliminar"
+														>
+															<Trash2 class="h-4 w-4" />
+														</button>
+													</div>
+												</td>
+											</tr>
+										{:else}
+											<tr>
+												<td colspan="5" class="p-8 text-center text-muted-foreground">
+													No hay usuarios registrados
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{:else}
+							<!-- Tabla de Roles -->
+							<div class="mb-4 flex justify-between items-center">
+								<h3 class="text-base font-semibold">Roles y Permisos</h3>
+								<button
+									on:click={() => openRoleModal()}
+									class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+								>
+									<Plus class="h-4 w-4" />
+									Crear Rol
+								</button>
+							</div>
+
+							<div class="border border-border rounded-lg overflow-hidden">
+								<table class="w-full">
+									<thead class="bg-muted">
+										<tr>
+											<th class="text-left p-3 text-sm font-medium">Nombre</th>
+											<th class="text-left p-3 text-sm font-medium">Descripción</th>
+											<th class="text-right p-3 text-sm font-medium">Acciones</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each roles as role}
+											<tr class="border-t border-border hover:bg-muted/50">
+												<td class="p-3">
+													<span class="font-medium">{role.name}</span>
+												</td>
+												<td class="p-3 text-sm text-muted-foreground">
+													{role.description || '-'}
+												</td>
+												<td class="p-3">
+													<div class="flex items-center justify-end gap-2">
+														<button
+															on:click={() => openRoleModal(role)}
+															class="p-2 hover:bg-accent rounded-lg transition-colors"
+															title="Editar"
+														>
+															<Edit2 class="h-4 w-4" />
+														</button>
+														<button
+															on:click={() => deleteRole(role.id)}
+															class="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+															title="Eliminar"
+														>
+															<Trash2 class="h-4 w-4" />
+														</button>
+													</div>
+												</td>
+											</tr>
+										{:else}
+											<tr>
+												<td colspan="3" class="p-8 text-center text-muted-foreground">
+													No hay roles definidos
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
 					</div>
 				{:else if activeTab === 'payments'}
 					<div class="p-6">
-						<h2 class="text-lg font-semibold mb-4">Métodos de Pago</h2>
-						<p class="text-muted-foreground">Configuración de métodos de pago del POS</p>
+						<div class="mb-6 flex justify-between items-center">
+							<div>
+								<h2 class="text-lg font-semibold">Métodos de Pago</h2>
+								<p class="text-sm text-muted-foreground">
+									Configura los métodos de pago disponibles en el POS
+								</p>
+							</div>
+							<button
+								on:click={() => openPaymentModal()}
+								class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+							>
+								<Plus class="h-4 w-4" />
+								Agregar Método
+							</button>
+						</div>
+
+						{#if loading}
+							<div class="flex justify-center items-center py-12">
+								<Loader class="h-8 w-8 animate-spin text-primary" />
+							</div>
+						{:else if paymentMethods.length === 0}
+							<div class="text-center py-12">
+								<Wallet class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+								<p class="text-muted-foreground mb-4">No hay métodos de pago configurados</p>
+								<button
+									on:click={() => openPaymentModal()}
+									class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+								>
+									<Plus class="h-4 w-4" />
+									Agregar Primer Método
+								</button>
+							</div>
+						{:else}
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								{#each paymentMethods as payment}
+									<div
+										class="border border-border rounded-lg p-4 hover:shadow-md transition-shadow"
+									>
+										<div class="flex items-start justify-between mb-3">
+											<div class="flex items-center gap-3">
+												{#if payment.logo_url}
+													<img
+														src={payment.logo_url}
+														alt={payment.name}
+														class="h-12 w-12 object-contain"
+													/>
+												{:else}
+													<div
+														class="h-12 w-12 bg-muted rounded-lg flex items-center justify-center"
+													>
+														<Wallet class="h-6 w-6 text-muted-foreground" />
+													</div>
+												{/if}
+												<div>
+													<h3 class="font-semibold">{payment.name}</h3>
+													{#if payment.is_active}
+														<span
+															class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-700 dark:text-green-400"
+														>
+															Activo
+														</span>
+													{:else}
+														<span
+															class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-700 dark:text-red-400"
+														>
+															Inactivo
+														</span>
+													{/if}
+												</div>
+											</div>
+										</div>
+
+										{#if payment.description}
+											<p class="text-sm text-muted-foreground mb-3 line-clamp-2">
+												{payment.description}
+											</p>
+										{/if}
+
+										<div class="flex items-center justify-between pt-3 border-t border-border">
+											<label class="flex items-center gap-2 cursor-pointer">
+												<input
+													type="checkbox"
+													checked={payment.is_active}
+													on:change={() => togglePaymentActive(payment.id, payment.is_active)}
+													class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
+												/>
+												<span class="text-sm">Habilitado</span>
+											</label>
+
+											<div class="flex items-center gap-1">
+												<button
+													on:click={() => openPaymentModal(payment)}
+													class="p-2 hover:bg-accent rounded-lg transition-colors"
+													title="Editar"
+												>
+													<Edit2 class="h-4 w-4" />
+												</button>
+												<button
+													on:click={() => deletePaymentMethod(payment.id)}
+													class="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+													title="Eliminar"
+												>
+													<Trash2 class="h-4 w-4" />
+												</button>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				{:else if activeTab === 'printers'}
 					<div class="p-6">
-						<h2 class="text-lg font-semibold mb-4">Impresoras</h2>
-						<p class="text-muted-foreground">Configuración de impresoras fiscales y térmicas</p>
+						<div class="mb-6 flex justify-between items-center">
+							<div>
+								<h2 class="text-lg font-semibold">Impresoras</h2>
+								<p class="text-sm text-muted-foreground">
+									Configura impresoras fiscales y térmicas para el sistema
+								</p>
+							</div>
+							<button
+								on:click={() => openPrinterModal()}
+								class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+							>
+								<Plus class="h-4 w-4" />
+								Agregar Impresora
+							</button>
+						</div>
+
+						{#if loading}
+							<div class="flex justify-center items-center py-12">
+								<Loader class="h-8 w-8 animate-spin text-primary" />
+							</div>
+						{:else if printers.length === 0}
+							<div class="text-center py-12">
+								<Printer class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+								<p class="text-muted-foreground mb-4">No hay impresoras configuradas</p>
+								<button
+									on:click={() => openPrinterModal()}
+									class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+								>
+									<Plus class="h-4 w-4" />
+									Agregar Primera Impresora
+								</button>
+							</div>
+						{:else}
+							<div class="border border-border rounded-lg overflow-hidden">
+								<table class="w-full">
+									<thead class="bg-muted">
+										<tr>
+											<th class="text-left p-3 text-sm font-medium">Nombre</th>
+											<th class="text-left p-3 text-sm font-medium">Tipo</th>
+											<th class="text-left p-3 text-sm font-medium">Conexión</th>
+											<th class="text-left p-3 text-sm font-medium">Dirección</th>
+											<th class="text-left p-3 text-sm font-medium">Estado</th>
+											<th class="text-right p-3 text-sm font-medium">Acciones</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each printers as printer}
+											<tr class="border-t border-border hover:bg-muted/50">
+												<td class="p-3">
+													<div class="flex items-center gap-2">
+														<Printer class="h-5 w-5 text-muted-foreground" />
+														<span class="font-medium">{printer.name}</span>
+													</div>
+												</td>
+												<td class="p-3 text-sm">
+													{#if printer.type === 'fiscal'}
+														<span
+															class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-700 dark:text-blue-400"
+														>
+															Fiscal
+														</span>
+													{:else}
+														<span
+															class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-700 dark:text-purple-400"
+														>
+															Térmica
+														</span>
+													{/if}
+												</td>
+												<td class="p-3 text-sm">
+													{#if printer.connection_type === 'usb'}
+														<span class="text-muted-foreground">USB</span>
+													{:else}
+														<span class="text-muted-foreground">Red</span>
+													{/if}
+												</td>
+												<td class="p-3 text-sm">
+													{#if printer.connection_type === 'network'}
+														<code class="text-xs bg-muted px-2 py-1 rounded">
+															{printer.ip_address}:{printer.port}
+														</code>
+													{:else}
+														<span class="text-muted-foreground">—</span>
+													{/if}
+												</td>
+												<td class="p-3">
+													<label class="flex items-center gap-2 cursor-pointer">
+														<input
+															type="checkbox"
+															checked={printer.is_active}
+															on:change={() => togglePrinterActive(printer.id, printer.is_active)}
+															class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
+														/>
+														<span class="text-sm">
+															{#if printer.is_active}
+																<span class="text-green-600 dark:text-green-400">Activa</span>
+															{:else}
+																<span class="text-muted-foreground">Inactiva</span>
+															{/if}
+														</span>
+													</label>
+												</td>
+												<td class="p-3">
+													<div class="flex items-center justify-end gap-2">
+														<button
+															on:click={() => openPrinterModal(printer)}
+															class="p-2 hover:bg-accent rounded-lg transition-colors"
+															title="Editar"
+														>
+															<Edit2 class="h-4 w-4" />
+														</button>
+														<button
+															on:click={() => deletePrinter(printer.id)}
+															class="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+															title="Eliminar"
+														>
+															<Trash2 class="h-4 w-4" />
+														</button>
+													</div>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
 		</div>
 	</div>
 </div>
+
+<!-- Modales -->
+<UserModal bind:open={showUserModal} user={editingUser} {allRoles} on:save={handleSaveUser} />
+<RoleModal bind:open={showRoleModal} role={editingRole} on:save={handleSaveRole} />
+<PaymentMethodModal
+	bind:open={showPaymentModal}
+	paymentMethod={editingPayment}
+	on:save={handleSavePayment}
+/>
+<PrinterModal bind:open={showPrinterModal} printer={editingPrinter} on:save={handleSavePrinter} />
