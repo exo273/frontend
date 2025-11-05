@@ -130,11 +130,18 @@
 
 	async function handleSubmit() {
 		try {
+			// Aplicar valores por defecto para ciudad y región si están vacíos
+			const dataToSend = {
+				...formData,
+				city: formData.city || 'Santiago',
+				region: formData.region || 'Región Metropolitana'
+			};
+
 			if (modalMode === 'create') {
-				await apiService.createSupplier(formData);
+				await apiService.createSupplier(dataToSend);
 				toast.success('Proveedor creado exitosamente');
 			} else {
-				await apiService.updateSupplier(selectedProveedor.id, formData);
+				await apiService.updateSupplier(selectedProveedor.id, dataToSend);
 				toast.success('Proveedor actualizado exitosamente');
 			}
 			showModal = false;
