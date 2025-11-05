@@ -28,6 +28,7 @@
 	let isDragging = false;
 
 	onMount(async () => {
+		console.log('🟣 Componente configuración montado');
 		await loadData();
 	});
 
@@ -55,9 +56,11 @@
 
 	// Zone functions
 	function openZoneModal(zone = null) {
+		console.log('🔵 openZoneModal llamado', { zone, showZoneModal });
 		editingZone = zone;
 		zoneModalMode = zone ? 'edit' : 'create';
 		showZoneModal = true;
+		console.log('🟢 showZoneModal actualizado a:', showZoneModal);
 	}
 
 	async function handleSaveZone() {
