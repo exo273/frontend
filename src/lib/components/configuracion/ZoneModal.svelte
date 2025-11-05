@@ -78,22 +78,22 @@
 	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
 		<!-- Nombre -->
 		<div>
-			<label for="zone-name" class="block text-sm font-medium mb-2">
-				Nombre <span class="text-error-500">*</span>
+			<label for="zone-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+				Nombre <span class="text-red-500">*</span>
 			</label>
 			<input
 				id="zone-name"
 				type="text"
 				bind:value={formData.nombre}
 				placeholder="Ej: Salón Principal, Terraza, Bar..."
-				class="input w-full"
+				class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 				required
 			/>
 		</div>
 
 		<!-- Descripción -->
 		<div>
-			<label for="zone-description" class="block text-sm font-medium mb-2">
+			<label for="zone-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 				Descripción
 			</label>
 			<textarea
@@ -101,7 +101,7 @@
 				bind:value={formData.descripcion}
 				placeholder="Descripción opcional de la zona..."
 				rows="3"
-				class="textarea w-full"
+				class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
 			/>
 		</div>
 
@@ -111,9 +111,9 @@
 				id="zone-active"
 				type="checkbox"
 				bind:checked={formData.is_active}
-				class="checkbox"
+				class="w-4 h-4 text-primary-600 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600"
 			/>
-			<label for="zone-active" class="text-sm font-medium">
+			<label for="zone-active" class="text-sm font-medium text-gray-700 dark:text-gray-300">
 				Zona activa
 			</label>
 		</div>

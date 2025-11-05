@@ -103,25 +103,30 @@
 		<div class="grid grid-cols-2 gap-4">
 			<!-- Número de Mesa -->
 			<div>
-				<label for="table-number" class="block text-sm font-medium mb-2">
-					Número <span class="text-error-500">*</span>
+				<label for="table-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					Número <span class="text-red-500">*</span>
 				</label>
 				<input
 					id="table-number"
 					type="text"
 					bind:value={formData.numero}
 					placeholder="1, 2, A1..."
-					class="input w-full"
+					class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					required
 				/>
 			</div>
 
 			<!-- Zona -->
 			<div>
-				<label for="table-zone" class="block text-sm font-medium mb-2">
-					Zona <span class="text-error-500">*</span>
+				<label for="table-zone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					Zona <span class="text-red-500">*</span>
 				</label>
-				<select id="table-zone" bind:value={formData.zona} class="select w-full" required>
+				<select 
+					id="table-zone" 
+					bind:value={formData.zona} 
+					class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+					required
+				>
 					<option value="">Seleccionar zona...</option>
 					{#each zones as zone}
 						<option value={zone.id}>{zone.nombre}</option>
@@ -131,7 +136,7 @@
 
 			<!-- Capacidad -->
 			<div>
-				<label for="table-capacity" class="block text-sm font-medium mb-2">
+				<label for="table-capacity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 					Capacidad
 				</label>
 				<input
@@ -140,16 +145,20 @@
 					bind:value={formData.capacidad}
 					min="1"
 					max="20"
-					class="input w-full"
+					class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 				/>
 			</div>
 
 			<!-- Forma -->
 			<div>
-				<label for="table-shape" class="block text-sm font-medium mb-2">
+				<label for="table-shape" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 					Forma
 				</label>
-				<select id="table-shape" bind:value={formData.forma} class="select w-full">
+				<select 
+					id="table-shape" 
+					bind:value={formData.forma} 
+					class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+				>
 					<option value="cuadrada">Cuadrada</option>
 					<option value="rectangular">Rectangular</option>
 					<option value="redonda">Redonda</option>
@@ -158,11 +167,11 @@
 		</div>
 
 		<!-- Dimensiones -->
-		<div class="border-t pt-4">
-			<h4 class="text-sm font-semibold mb-3">Dimensiones y Posición</h4>
+		<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+			<h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Dimensiones y Posición</h4>
 			<div class="grid grid-cols-2 gap-4">
 				<div>
-					<label for="table-width" class="block text-sm font-medium mb-2">
+					<label for="table-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 						Ancho (px)
 					</label>
 					<input
@@ -172,12 +181,12 @@
 						min="50"
 						max="300"
 						step="10"
-						class="input w-full"
+						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 
 				<div>
-					<label for="table-height" class="block text-sm font-medium mb-2">
+					<label for="table-height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 						Alto (px)
 					</label>
 					<input
@@ -187,12 +196,12 @@
 						min="50"
 						max="300"
 						step="10"
-						class="input w-full"
+						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 
 				<div>
-					<label for="table-x" class="block text-sm font-medium mb-2">
+					<label for="table-x" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 						Posición X
 					</label>
 					<input
@@ -200,12 +209,12 @@
 						type="number"
 						bind:value={formData.posicion_x}
 						step="10"
-						class="input w-full"
+						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 
 				<div>
-					<label for="table-y" class="block text-sm font-medium mb-2">
+					<label for="table-y" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 						Posición Y
 					</label>
 					<input
@@ -213,7 +222,7 @@
 						type="number"
 						bind:value={formData.posicion_y}
 						step="10"
-						class="input w-full"
+						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 			</div>
