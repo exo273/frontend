@@ -43,15 +43,13 @@
 		cantidad: 0
 	};
 
-	$: filteredRecetas = searchQuery
-		? recetas.filter(
-				(r) =>
-					r.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					r.descripcion?.toLowerCase().includes(searchQuery.toLowerCase())
-		  )
-		: recetas;
-
-	onMount(async () => {
+$: filteredRecetas = searchQuery
+	? recetas.filter(
+			(r) =>
+				r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				r.descripcion?.toLowerCase().includes(searchQuery.toLowerCase())
+	  )
+	: recetas;	onMount(async () => {
 		await loadRecetas();
 		await loadProductos();
 	});
@@ -116,19 +114,17 @@
 			return;
 		}
 
-		const producto = productos.find((p) => p.id === parseInt(newIngrediente.producto));
-		formData.ingredientes = [
-			...formData.ingredientes,
-			{
-				producto: newIngrediente.producto,
-				producto_nombre: producto?.nombre || '',
-				producto_unidad: producto?.unidad || '',
-				producto_costo: producto?.costo_promedio || 0,
-				cantidad: newIngrediente.cantidad
-			}
-		];
-
-		newIngrediente = {
+	const producto = productos.find((p) => p.id === parseInt(newIngrediente.producto));
+	formData.ingredientes = [
+		...formData.ingredientes,
+		{
+			producto: newIngrediente.producto,
+			producto_nombre: producto?.name || '',
+			producto_unidad: producto?.unit || '',
+			producto_costo: producto?.costo_promedio || 0,
+			cantidad: newIngrediente.cantidad
+		}
+	];		newIngrediente = {
 			producto: '',
 			cantidad: 0
 		};
@@ -246,7 +242,7 @@
 				<Card class="hover:border-primary/50 transition-colors cursor-pointer" on:click={() => openEditModal(receta)}>
 					<CardHeader>
 						<CardTitle class="flex items-start justify-between">
-							<span class="text-lg">{receta.nombre}</span>
+							<span class="text-lg">{receta.name}</span>
 							<Button variant="ghost" size="sm" on:click={(e) => { e.stopPropagation(); openEditModal(receta); }}>
 								<Edit2 class="h-4 w-4" />
 							</Button>
@@ -373,9 +369,9 @@
 							>
 								<option value="">Seleccione...</option>
 								{#each productos as producto}
-									<option value={producto.id}>
-										{producto.nombre} ({producto.unidad}) - S/ {producto.costo_promedio.toFixed(2)}
-									</option>
+								<option value={producto.id}>
+									{producto.name} ({producto.unit}) - S/ {producto.costo_promedio.toFixed(2)}
+								</option>
 								{/each}
 							</select>
 						</div>
