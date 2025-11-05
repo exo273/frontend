@@ -27,9 +27,13 @@
 		name: '',
 		rut: '',
 		address: '',
+		city: '',
+		region: '',
 		phone: '',
 		email: '',
+		website: '',
 		contact_person: '',
+		notes: '',
 		is_active: true
 	};
 
@@ -89,9 +93,13 @@
 			name: '',
 			rut: '',
 			address: '',
+			city: '',
+			region: '',
 			phone: '',
 			email: '',
+			website: '',
 			contact_person: '',
+			notes: '',
 			is_active: true
 		};
 		showModal = true;
@@ -276,6 +284,24 @@
 
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div class="space-y-2">
+						<label class="text-sm font-medium">Ciudad</label>
+						<Input
+							bind:value={formData.city}
+							placeholder="Santiago"
+						/>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Región</label>
+						<Input
+							bind:value={formData.region}
+							placeholder="Región Metropolitana"
+						/>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="space-y-2">
 						<label class="text-sm font-medium">Teléfono</label>
 						<Input
 							type="tel"
@@ -294,11 +320,31 @@
 					</div>
 				</div>
 
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Nombre de Contacto</label>
+						<Input
+							bind:value={formData.contact_person}
+							placeholder="Nombre del contacto principal"
+						/>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-sm font-medium">Sitio Web</label>
+						<Input
+							type="url"
+							bind:value={formData.website}
+							placeholder="https://www.proveedor.cl"
+						/>
+					</div>
+				</div>
+
 				<div class="space-y-2">
-					<label class="text-sm font-medium">Nombre de Contacto</label>
-					<Input
-						bind:value={formData.contact_person}
-						placeholder="Nombre del contacto principal"
+					<label class="text-sm font-medium">Notas</label>
+					<textarea
+						bind:value={formData.notes}
+						placeholder="Notas adicionales sobre el proveedor"
+						class="w-full min-h-[80px] px-3 py-2 text-sm rounded-md border border-input bg-background"
 					/>
 				</div>
 
