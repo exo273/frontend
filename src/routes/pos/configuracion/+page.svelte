@@ -35,7 +35,8 @@
 	async function loadData() {
 		loading = true;
 		try {
-			zones = await apiService.getZones();
+			const zonesResponse = await apiService.getZones();
+			zones = zonesResponse.results || zonesResponse;
 			console.log('📍 Zonas cargadas:', zones);
 			const response = await apiService.getTables({ page_size: 1000 });
 			tables = response.results || response;
