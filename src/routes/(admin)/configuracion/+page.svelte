@@ -649,11 +649,14 @@
 			<nav class="space-y-1">
 				{#each tabs as tab}
 					<button
+						type="button"
 						on:click={() => selectTab(tab.id)}
-						class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors
-							{activeTab === tab.id
-								? 'bg-primary text-primary-foreground'
-								: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+						class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+						class:bg-primary={activeTab === tab.id}
+						class:text-primary-foreground={activeTab === tab.id}
+						class:text-muted-foreground={activeTab !== tab.id}
+						class:hover:bg-muted={activeTab !== tab.id}
+						class:hover:text-foreground={activeTab !== tab.id}
 					>
 						<svelte:component this={tab.icon} className="h-5 w-5" />
 						{tab.label}
