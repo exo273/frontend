@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { auth, toast } from '$lib/stores';
 	import { apiService } from '$lib/api';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import Settings from '$lib/components/icons/Settings.svelte';
 	import Home from '$lib/components/icons/Home.svelte';
 	import Users from '$lib/components/icons/Users.svelte';
@@ -1137,17 +1138,13 @@
 										{/if}
 
 										<div class="flex items-center justify-between pt-3 border-t border-border">
-											<label class="flex items-center gap-2 cursor-pointer">
-												<input
-													type="checkbox"
-													checked={payment.is_active}
-													on:change={() => togglePaymentActive(payment.id, payment.is_active)}
-													class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
-												/>
-												<span class="text-sm">Habilitado</span>
-											</label>
-
-											<div class="flex items-center gap-1">
+										<label class="flex items-center gap-2 cursor-pointer">
+											<Checkbox
+												checked={payment.is_active}
+												on:click={() => togglePaymentActive(payment.id, payment.is_active)}
+											/>
+											<span class="text-sm">Habilitado</span>
+										</label>											<div class="flex items-center gap-1">
 												<button
 													on:click={() => openPaymentModal(payment)}
 													class="p-2 hover:bg-accent rounded-lg transition-colors"
@@ -1258,11 +1255,9 @@
 												</td>
 												<td class="p-3">
 													<label class="flex items-center gap-2 cursor-pointer">
-														<input
-															type="checkbox"
+														<Checkbox
 															checked={printer.is_active}
-															on:change={() => togglePrinterActive(printer.id, printer.is_active)}
-															class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
+															on:click={() => togglePrinterActive(printer.id, printer.is_active)}
 														/>
 														<span class="text-sm">
 															{#if printer.is_active}

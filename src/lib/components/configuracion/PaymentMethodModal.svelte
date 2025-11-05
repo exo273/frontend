@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import Upload from '$lib/components/icons/Upload.svelte';
 	import Image from '$lib/components/icons/Image.svelte';
 	import X from '$lib/components/icons/X.svelte';
@@ -139,20 +140,16 @@
 					/>
 				</div>
 
-				<!-- Estado activo -->
-				<div class="flex items-center gap-3">
-					<input
-						type="checkbox"
-						id="is_active"
-						bind:checked={formData.is_active}
-						class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
-					/>
-					<label for="is_active" class="text-sm font-medium cursor-pointer">
-						Método de pago activo
-					</label>
-				</div>
-
-				<!-- Botones -->
+			<!-- Estado activo -->
+			<div class="flex items-center gap-3">
+				<Checkbox
+					id="is_active"
+					bind:checked={formData.is_active}
+				/>
+				<label for="is_active" class="text-sm font-medium cursor-pointer">
+					Método de pago activo
+				</label>
+			</div>				<!-- Botones -->
 				<div class="flex gap-3 pt-4">
 					<button
 						type="button"

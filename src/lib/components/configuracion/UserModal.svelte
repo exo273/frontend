@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import Upload from '$lib/components/icons/Upload.svelte';
 	import Image from '$lib/components/icons/Image.svelte';
 	import X from '$lib/components/icons/X.svelte';
@@ -268,21 +269,17 @@
 					{/if}
 				</div>
 			</div>
-		{/if}
+	{/if}
 
-		<!-- Estado Activo -->
-		<div class="flex items-center gap-2">
-			<input
-				type="checkbox"
-				id="is_active"
-				bind:checked={formData.is_active}
-				class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-primary"
-			/>
-			<label for="is_active" class="text-sm font-medium cursor-pointer">Usuario activo</label>
-		</div>
+	<!-- Estado Activo -->
+	<div class="flex items-center gap-2">
+		<Checkbox
+			id="is_active"
+			bind:checked={formData.is_active}
+		/>
+		<label for="is_active" class="text-sm font-medium cursor-pointer">Usuario activo</label>
 	</div>
-
-	<svelte:fragment slot="footer">
+</div>	<svelte:fragment slot="footer">
 		<button
 			type="button"
 			on:click={handleClose}

@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
 	export let open = false;
 	export let role = null;
@@ -165,19 +166,17 @@
 					<div class="border border-border rounded-lg p-4">
 						<h4 class="font-medium text-sm mb-3">{label}</h4>
 
-						<div class="grid grid-cols-2 gap-2">
-							{#each actions as action}
-								<label class="flex items-center gap-2 cursor-pointer hover:bg-accent p-2 rounded">
-									<input
-										type="checkbox"
-										checked={hasPermission(module, action)}
-										on:change={() => togglePermission(module, action)}
-										class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-primary"
-									/>
-									<span class="text-sm">{actionLabels[action] || action}</span>
-								</label>
-							{/each}
-						</div>
+					<div class="grid grid-cols-2 gap-2">
+						{#each actions as action}
+							<label class="flex items-center gap-2 cursor-pointer hover:bg-accent p-2 rounded">
+								<Checkbox
+									checked={hasPermission(module, action)}
+									on:click={() => togglePermission(module, action)}
+								/>
+								<span class="text-sm">{actionLabels[action] || action}</span>
+							</label>
+						{/each}
+					</div>
 					</div>
 				{/each}
 			</div>

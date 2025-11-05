@@ -10,6 +10,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import FileText from '$lib/components/icons/FileText.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Edit2 from '$lib/components/icons/Edit2.svelte';
@@ -406,19 +407,15 @@
 				/>
 			</div>
 
-			<div class="flex items-center space-x-2">
-				<input 
-					type="checkbox" 
-					bind:checked={formData.disponible} 
-					id="disponible"
-					class="h-4 w-4 rounded border-input"
-				/>
-				<label for="disponible" class="text-sm font-medium">
-					Disponible para venta
-				</label>
-			</div>
-
-			{#if formData.receta}
+		<div class="flex items-center space-x-2">
+			<Checkbox 
+				bind:checked={formData.disponible} 
+				id="disponible"
+			/>
+			<label for="disponible" class="text-sm font-medium">
+				Disponible para venta
+			</label>
+		</div>			{#if formData.receta}
 				<Card class="bg-primary/5 border-primary/20">
 					<CardContent class="p-4">
 						<p class="text-sm text-muted-foreground">

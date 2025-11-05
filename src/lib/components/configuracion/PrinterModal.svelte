@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import X from '$lib/components/icons/X.svelte';
 
 	export let open = false;
@@ -164,20 +165,16 @@
 					</div>
 				{/if}
 
-				<!-- Estado activo -->
-				<div class="flex items-center gap-3">
-					<input
-						type="checkbox"
-						id="printer_active"
-						bind:checked={formData.is_active}
-						class="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
-					/>
-					<label for="printer_active" class="text-sm font-medium cursor-pointer">
-						Impresora activa y disponible
-					</label>
-				</div>
-
-				<!-- Botones -->
+			<!-- Estado activo -->
+			<div class="flex items-center gap-3">
+				<Checkbox
+					id="printer_active"
+					bind:checked={formData.is_active}
+				/>
+				<label for="printer_active" class="text-sm font-medium cursor-pointer">
+					Impresora activa y disponible
+				</label>
+			</div>				<!-- Botones -->
 				<div class="flex gap-3 pt-4">
 					<button
 						type="button"

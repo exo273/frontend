@@ -8,6 +8,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import Users from '$lib/components/icons/Users.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Edit from '$lib/components/icons/Edit.svelte';
@@ -360,12 +361,10 @@
 					/>
 				</div>
 
-				<label class="flex items-center space-x-2">
-					<input type="checkbox" bind:checked={formData.is_active} class="h-4 w-4 rounded border-input" />
-					<span class="text-sm font-medium">Proveedor Activo</span>
-				</label>
-
-				<div class="flex justify-end gap-2 pt-4">
+			<label class="flex items-center space-x-2">
+				<Checkbox bind:checked={formData.is_active} />
+				<span class="text-sm font-medium">Proveedor Activo</span>
+			</label>				<div class="flex justify-end gap-2 pt-4">
 					<Button type="button" variant="ghost" on:click={() => (showModal = false)}>
 						Cancelar
 					</Button>
