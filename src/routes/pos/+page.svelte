@@ -89,12 +89,13 @@
 </script>
 
 <div class="h-screen flex flex-col bg-background">
-	<!-- Header -->
-	<div class="bg-sidebar border-b border-border px-6 py-3 flex items-center justify-between">
-		<div class="flex items-center gap-2">
+	<!-- Header unificado -->
+	<div class="bg-sidebar border-b border-border px-4 py-2 flex items-center gap-3">
+		<!-- Botones de modo -->
+		<div class="flex items-center gap-1">
 			<button
 				on:click={() => (orderMode = 'mesas')}
-				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'mesas'
+				class="px-3 py-2 text-sm font-medium transition-colors rounded-lg {orderMode === 'mesas'
 					? 'bg-primary text-primary-foreground'
 					: 'text-foreground hover:bg-muted'}"
 			>
@@ -102,7 +103,7 @@
 			</button>
 			<button
 				on:click={() => (orderMode = 'mostrador')}
-				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'mostrador'
+				class="px-3 py-2 text-sm font-medium transition-colors rounded-lg {orderMode === 'mostrador'
 					? 'bg-primary text-primary-foreground'
 					: 'text-foreground hover:bg-muted'}"
 			>
@@ -110,17 +111,42 @@
 			</button>
 			<button
 				on:click={() => (orderMode = 'para-llevar')}
-				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'para-llevar'
+				class="px-3 py-2 text-sm font-medium transition-colors rounded-lg {orderMode === 'para-llevar'
 					? 'bg-primary text-primary-foreground'
 					: 'text-foreground hover:bg-muted'}"
 			>
 				Para llevar
 			</button>
 		</div>
-		<div class="flex items-center gap-4">
+
+		<!-- Separador vertical -->
+		{#if orderMode === 'mesas'}
+			<div class="h-8 w-px bg-border"></div>
+
+			<!-- Tabs de zonas -->
+			<div class="flex items-center gap-1">
+				{#each zones as zone}
+					<button
+						on:click={() => (selectedZone = zone.id)}
+						class="px-4 py-2 text-sm font-medium transition-colors rounded-lg {selectedZone === zone.id
+							? 'bg-primary text-primary-foreground'
+							: 'text-foreground hover:bg-muted'}"
+					>
+						{zone.nombre}
+					</button>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Spacer para empujar elementos a la derecha -->
+		<div class="flex-1"></div>
+
+		<!-- Controles del lado derecho -->
+		<div class="flex items-center gap-2">
+			<!-- Botón agrupación -->
 			<button
 				on:click={() => (isGroupingMode = !isGroupingMode)}
-				class="px-4 py-2 font-medium transition-colors rounded-lg border {isGroupingMode
+				class="p-2 transition-colors rounded-lg border {isGroupingMode
 					? 'bg-primary text-primary-foreground border-primary'
 					: 'bg-muted text-foreground border-border hover:bg-accent'}"
 				title={isGroupingMode ? 'Desactivar modo agrupación' : 'Activar modo agrupación'}
@@ -130,17 +156,21 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6v12M16 6v12" />
 				</svg>
 			</button>
+
+			<!-- Búsqueda -->
 			<div class="relative">
 				<input
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Ir a mesa"
-					class="px-4 py-2 pl-10 rounded-lg bg-muted text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-64 border border-input"
+					class="px-3 py-2 pl-9 rounded-lg bg-muted text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-48 border border-input text-sm"
 				/>
 				<Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 			</div>
+
+			<!-- Menú hamburguesa -->
 			<button class="p-2 hover:bg-accent rounded-lg transition-colors">
-				<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
 				</svg>
 			</button>
@@ -150,22 +180,6 @@
 	<div class="flex-1 flex overflow-hidden">
 		<!-- Main Content - Tables -->
 		<div class="flex-1 flex flex-col">
-			<!-- Tabs de Zonas - solo visible en modo mesas -->
-			{#if orderMode === 'mesas'}
-				<div class="bg-sidebar border-b border-border flex items-center gap-2 px-4 py-2">
-					{#each zones as zone}
-						<button
-							on:click={() => (selectedZone = zone.id)}
-							class="px-6 py-3 font-medium transition-colors rounded-lg {selectedZone === zone.id
-								? 'bg-primary text-primary-foreground'
-								: 'text-foreground hover:bg-muted'}"
-						>
-							{zone.nombre}
-						</button>
-					{/each}
-				</div>
-			{/if}
-
 			<!-- Canvas de Mesas o vista de productos -->
 			<div class="flex-1 p-6 overflow-auto relative bg-background">
 				{#if orderMode === 'mesas'}
