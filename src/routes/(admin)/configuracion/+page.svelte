@@ -232,7 +232,7 @@
 		showUserModal = true;
 	}
 
-	async function handleUserSubmit(event) {
+	async function handleSaveUser(event) {
 		const data = event.detail;
 		saving = true;
 
@@ -313,7 +313,7 @@
 		showRoleModal = true;
 	}
 
-	async function handleRoleSubmit(event) {
+	async function handleSaveRole(event) {
 		const data = event.detail;
 		saving = true;
 
