@@ -22,6 +22,15 @@ class APIClient {
 		const authState = get(auth);
 		const url = `${this.baseURL}${endpoint}`;
 
+		// Debug: Log para verificar si el token existe
+		if (endpoint.includes('/api/pos/')) {
+			console.log('🔑 POS Request:', {
+				endpoint,
+				hasToken: !!authState.accessToken,
+				tokenPreview: authState.accessToken ? `${authState.accessToken.substring(0, 20)}...` : 'NO TOKEN'
+			});
+		}
+
 		const config = {
 			...options,
 			headers: {
