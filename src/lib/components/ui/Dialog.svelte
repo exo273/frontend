@@ -87,11 +87,18 @@
 								{description}
 							</p>
 						{/if}
-					</div>
+					{/if}
 				{/if}
 
 				<!-- Content Slot -->
 				<slot />
+
+				<!-- Footer Slot -->
+				{#if $$slots.footer}
+					<div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+						<slot name="footer" />
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
