@@ -1298,7 +1298,7 @@
 </div>
 
 <!-- Modales -->
-<UserModal bind:open={showUserModal} user={editingUser} {allRoles} on:save={handleSaveUser} />
+<UserModal bind:open={showUserModal} user={editingUser} allRoles={roles} on:save={handleSaveUser} />
 <RoleModal bind:open={showRoleModal} role={editingRole} on:save={handleSaveRole} />
 <PaymentMethodModal
 	bind:open={showPaymentModal}
