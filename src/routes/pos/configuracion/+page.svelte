@@ -90,7 +90,20 @@
 
 	// Table functions
 	function openTableModal(table = null) {
-		editingTable = table;
+		if (!table && selectedZone) {
+			// Si es una nueva mesa, pre-cargar la zona seleccionada
+			editingTable = {
+				zona: selectedZone,
+				capacidad: 4,
+				posicion_x: 50,
+				posicion_y: 50,
+				ancho: 100,
+				alto: 100,
+				forma: 'cuadrada'
+			};
+		} else {
+			editingTable = table;
+		}
 		tableModalMode = table ? 'edit' : 'create';
 		showTableModal = true;
 	}
@@ -137,16 +150,23 @@
 		const canvas = event.currentTarget;
 		const rect = canvas.getBoundingClientRect();
 		
+		const width = draggedTable.ancho || 100;
+		const height = draggedTable.alto || 100;
+		
 		// Calcular posición relativa con snap to grid
-		const x = Math.max(0, Math.min(event.clientX - rect.left - (draggedTable.ancho / 2), rect.width - draggedTable.ancho));
-		const y = Math.max(0, Math.min(event.clientY - rect.top - (draggedTable.alto / 2), rect.height - draggedTable.alto));
+		const x = Math.max(0, Math.min(event.clientX - rect.left - (width / 2), rect.width - width));
+		const y = Math.max(0, Math.min(event.clientY - rect.top - (height / 2), rect.height - height));
 
 		try {
 			await apiService.updateTable(draggedTable.id, {
-				...draggedTable,
+				numero: draggedTable.numero,
 				zona: draggedTable.zona?.id || draggedTable.zona,
+				capacidad: draggedTable.capacidad || 4,
 				posicion_x: Math.round(x / 10) * 10,
-				posicion_y: Math.round(y / 10) * 10
+				posicion_y: Math.round(y / 10) * 10,
+				ancho: width,
+				alto: height,
+				forma: draggedTable.forma || 'cuadrada'
 			});
 			await loadData();
 			toast.success('Mesa reposicionada');
@@ -294,25 +314,28 @@
 						</div>
 					{:else}
 						{#each zoneTables as table}
+							{@const width = table.ancho || 100}
+							{@const height = table.alto || 100}
+							{@const x = table.posicion_x ?? Math.random() * 200}
+							{@const y = table.posicion_y ?? Math.random() * 200}
+							{@const shape = table.forma || 'cuadrada'}
 							<div
 								draggable="true"
 								on:dragstart={(e) => handleTableDragStart(e, table)}
 								on:dragend={handleTableDragEnd}
-								class="absolute cursor-move border-2 bg-card hover:bg-accent transition-all rounded-lg flex flex-col items-center justify-center text-center shadow-lg group select-none {isDragging &&
+								class="absolute cursor-move border-2 bg-card hover:bg-accent transition-all flex flex-col items-center justify-center text-center shadow-lg group select-none {isDragging &&
 								draggedTable?.id === table.id
-									? 'opacity-50 border-primary'
+									? 'opacity-50 border-primary/50'
 									: 'border-primary'}"
-								style="left: {table.posicion_x}px; top: {table.posicion_y}px; width: {table.ancho}px; height: {table.alto}px; {table.forma ===
+								style="left: {x}px; top: {y}px; width: {width}px; height: {height}px; {shape ===
 								'redonda'
 									? 'border-radius: 50%;'
-									: table.forma === 'rectangular'
-										? 'border-radius: 0.5rem;'
-										: 'border-radius: 0.5rem;'}"
+									: 'border-radius: 0.5rem;'}"
 								role="button"
 								tabindex="0"
 							>
-								<div class="font-bold text-xl">Mesa {table.numero}</div>
-								<div class="text-sm text-muted-foreground">{table.capacidad} personas</div>
+								<div class="font-bold text-xl text-foreground">Mesa {table.numero}</div>
+								<div class="text-sm text-muted-foreground">{table.capacidad || 4} personas</div>
 
 								<!-- Botones de acción -->
 								<div
