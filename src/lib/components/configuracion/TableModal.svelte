@@ -78,10 +78,17 @@
 
 		loading = true;
 		try {
+			// Preparar datos sin campos que el backend no acepta
 			const dataToSend = {
-				...formData,
-				numero: String(formData.numero)
+				numero: String(formData.numero),
+				zona: formData.zona,
+				capacidad: formData.capacidad,
+				posicion_x: formData.posicion_x,
+				posicion_y: formData.posicion_y,
+				is_active: formData.is_active
 			};
+
+			console.log('Enviando datos:', dataToSend);
 
 			if (mode === 'edit' && table) {
 				await apiService.updateTable(table.id, dataToSend);
@@ -94,7 +101,8 @@
 			handleClose();
 		} catch (error) {
 			console.error('Error al guardar mesa:', error);
-			toast.error(error.response?.data?.detail || 'Error al guardar mesa');
+			console.error('Respuesta del servidor:', error.response?.data);
+			toast.error(error.response?.data?.detail || error.response?.data?.message || 'Error al guardar mesa');
 		} finally {
 			loading = false;
 		}

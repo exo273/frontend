@@ -184,18 +184,17 @@
 				capacidad: 4,
 				posicion_x: col,
 				posicion_y: row,
-				ancho: 1,
-				alto: 1,
-				forma: 'cuadrada',
 				is_active: true
 			};
 
+			console.log('Creando mesa:', newTable);
 			await apiService.createTable(newTable);
 			toast.success(`Mesa ${nextNumber} creada`);
 			await loadData();
 		} catch (error) {
 			console.error('Error al crear mesa:', error);
-			toast.error('Error al crear mesa');
+			console.error('Respuesta del servidor:', error.response?.data);
+			toast.error(error.response?.data?.detail || error.response?.data?.message || 'Error al crear mesa');
 		}
 	}
 
