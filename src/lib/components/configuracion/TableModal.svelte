@@ -18,8 +18,8 @@
 		capacidad: 4,
 		posicion_x: 0,
 		posicion_y: 0,
-		ancho: 100,
-		alto: 100,
+		ancho: 1,  // en unidades de cuadrícula
+		alto: 1,   // en unidades de cuadrícula
 		forma: 'cuadrada',
 		is_active: true
 	};
@@ -33,10 +33,23 @@
 			capacidad: table.capacidad || 4,
 			posicion_x: table.posicion_x || 0,
 			posicion_y: table.posicion_y || 0,
-			ancho: table.ancho || 100,
-			alto: table.alto || 100,
+			ancho: table.ancho || 1,
+			alto: table.alto || 1,
 			forma: table.forma || 'cuadrada',
 			is_active: table.is_active !== undefined ? table.is_active : true
+		};
+	} else if (mode === 'create' && table) {
+		// Para nuevas mesas con posición predefinida
+		formData = {
+			numero: '',
+			zona: table.zona || (zones.length > 0 ? zones[0].id : ''),
+			capacidad: 4,
+			posicion_x: table.posicion_x || 0,
+			posicion_y: table.posicion_y || 0,
+			ancho: 1,
+			alto: 1,
+			forma: 'cuadrada',
+			is_active: true
 		};
 	} else if (mode === 'create') {
 		formData = {
@@ -45,8 +58,8 @@
 			capacidad: 4,
 			posicion_x: 0,
 			posicion_y: 0,
-			ancho: 100,
-			alto: 100,
+			ancho: 1,
+			alto: 1,
 			forma: 'cuadrada',
 			is_active: true
 		};
@@ -168,61 +181,69 @@
 
 		<!-- Dimensiones -->
 		<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-			<h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Dimensiones y Posición</h4>
+			<h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Tamaño (en celdas de cuadrícula)</h4>
 			<div class="grid grid-cols-2 gap-4">
 				<div>
 					<label for="table-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Ancho (px)
+						Ancho (celdas)
 					</label>
 					<input
 						id="table-width"
 						type="number"
 						bind:value={formData.ancho}
-						min="50"
-						max="300"
-						step="10"
+						min="1"
+						max="4"
+						step="1"
 						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 
 				<div>
 					<label for="table-height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Alto (px)
+						Alto (celdas)
 					</label>
 					<input
 						id="table-height"
 						type="number"
 						bind:value={formData.alto}
-						min="50"
-						max="300"
-						step="10"
+						min="1"
+						max="4"
+						step="1"
 						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 					/>
 				</div>
 
 				<div>
 					<label for="table-x" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Posición X
+						Posición Columna
 					</label>
 					<input
 						id="table-x"
 						type="number"
 						bind:value={formData.posicion_x}
-						step="10"
+						min="0"
+						max="11"
+						step="1"
 						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+						readonly
+						title="La posición se establece al hacer clic en la cuadrícula"
 					/>
 				</div>
 
 				<div>
 					<label for="table-y" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Posición Y
+						Posición Fila
 					</label>
 					<input
 						id="table-y"
 						type="number"
 						bind:value={formData.posicion_y}
-						step="10"
+						min="0"
+						max="7"
+						step="1"
 						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+						readonly
+						title="La posición se establece al hacer clic en la cuadrícula"
 					/>
 				</div>
 			</div>

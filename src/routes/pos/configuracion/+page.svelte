@@ -23,9 +23,10 @@
 	let zoneModalMode = 'create';
 	let tableModalMode = 'create';
 	
-	// Drag & Drop
-	let draggedTable = null;
-	let isDragging = false;
+	// Grid configuration
+	const GRID_ROWS = 8;
+	const GRID_COLS = 12;
+	const CELL_SIZE = 80; // px
 
 	onMount(async () => {
 		console.log('🟣 Componente configuración montado');
@@ -89,16 +90,16 @@
 	}
 
 	// Table functions
-	function openTableModal(table = null) {
+	function openTableModal(table = null, gridRow = null, gridCol = null) {
 		if (!table && selectedZone) {
-			// Si es una nueva mesa, pre-cargar la zona seleccionada
+			// Si es una nueva mesa, usar la posición de la cuadrícula
 			editingTable = {
 				zona: selectedZone,
 				capacidad: 4,
-				posicion_x: 50,
-				posicion_y: 50,
-				ancho: 100,
-				alto: 100,
+				posicion_x: gridCol !== null ? gridCol : 0,
+				posicion_y: gridRow !== null ? gridRow : 0,
+				ancho: 1, // en unidades de cuadrícula
+				alto: 1,
 				forma: 'cuadrada'
 			};
 		} else {
@@ -131,57 +132,43 @@
 		return tables.filter((t) => (t.zona?.id || t.zona) === zoneId);
 	}
 
-	// Drag & Drop functions
-	function handleTableDragStart(event, table) {
-		draggedTable = table;
-		isDragging = true;
-		event.dataTransfer.effectAllowed = 'move';
-	}
+	// Grid functions
+	function handleCellClick(row, col) {
+		// Verificar si hay una mesa en esta celda
+		const zoneTables = getTablesByZone(selectedZone);
+		const tableInCell = zoneTables.find(
+			(t) => t.posicion_y === row && t.posicion_x === col
+		);
 
-	function handleTableDragEnd(event) {
-		isDragging = false;
-		draggedTable = null;
-	}
-
-	async function handleTableDrop(event) {
-		event.preventDefault();
-		if (!draggedTable) return;
-
-		const canvas = event.currentTarget;
-		const rect = canvas.getBoundingClientRect();
-		
-		const width = draggedTable.ancho || 100;
-		const height = draggedTable.alto || 100;
-		
-		// Calcular posición relativa con snap to grid
-		const x = Math.max(0, Math.min(event.clientX - rect.left - (width / 2), rect.width - width));
-		const y = Math.max(0, Math.min(event.clientY - rect.top - (height / 2), rect.height - height));
-
-		try {
-			await apiService.updateTable(draggedTable.id, {
-				numero: draggedTable.numero,
-				zona: draggedTable.zona?.id || draggedTable.zona,
-				capacidad: draggedTable.capacidad || 4,
-				posicion_x: Math.round(x / 10) * 10,
-				posicion_y: Math.round(y / 10) * 10,
-				ancho: width,
-				alto: height,
-				forma: draggedTable.forma || 'cuadrada'
-			});
-			await loadData();
-			toast.success('Mesa reposicionada');
-		} catch (error) {
-			console.error('Error al actualizar posición:', error);
-			toast.error('Error al mover mesa');
+		if (tableInCell) {
+			// Si hay una mesa, abrir modal para editar
+			openTableModal(tableInCell);
+		} else {
+			// Si no hay mesa, abrir modal para crear
+			openTableModal(null, row, col);
 		}
-
-		isDragging = false;
-		draggedTable = null;
 	}
 
-	function handleDragOver(event) {
-		event.preventDefault();
-		event.dataTransfer.dropEffect = 'move';
+	function isTableInCell(row, col, zoneTables) {
+		return zoneTables.find(
+			(t) => {
+				const tableRow = t.posicion_y ?? 0;
+				const tableCol = t.posicion_x ?? 0;
+				const tableHeight = t.alto || 1;
+				const tableWidth = t.ancho || 1;
+				
+				return row >= tableRow && 
+					   row < tableRow + tableHeight && 
+					   col >= tableCol && 
+					   col < tableCol + tableWidth;
+			}
+		);
+	}
+
+	function getTableAtPosition(row, col, zoneTables) {
+		return zoneTables.find(
+			(t) => t.posicion_y === row && t.posicion_x === col
+		);
 	}
 </script>
 
@@ -281,93 +268,69 @@
 					<div>
 						<h2 class="text-2xl font-bold">{zone?.nombre}</h2>
 						<p class="text-sm text-muted-foreground">
-							Arrastra las mesas para posicionarlas • {zoneTables.length} mesas
+							Haz clic en una celda para agregar o editar mesa • {zoneTables.length} mesas
 						</p>
 					</div>
-					<button
-						on:click={() => openTableModal()}
-						class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
-					>
-						<Plus class="h-4 w-4" />
-						Nueva Mesa
-					</button>
 				</div>
 			</div>
 
-			<!-- Canvas de mesas -->
+			<!-- Canvas de mesas con cuadrícula -->
 			<div class="flex-1 overflow-auto p-6 bg-muted/30">
-				<div
-					class="relative bg-background rounded-lg border-2 border-dashed border-border"
-					style="min-height: calc(100vh - 200px); width: 100%;"
-					on:drop={handleTableDrop}
-					on:dragover={handleDragOver}
-					role="application"
-					aria-label="Canvas de mesas"
-				>
-					{#if zoneTables.length === 0}
-						<div class="absolute inset-0 flex items-center justify-center text-muted-foreground">
-							<div class="text-center">
-								<p class="text-2xl mb-2">🪑</p>
-								<p class="text-lg font-semibold">No hay mesas en esta zona</p>
-								<p class="text-sm mt-1">Crea una mesa para comenzar</p>
-							</div>
-						</div>
-					{:else}
-						{#each zoneTables as table}
-							{@const width = table.ancho || 100}
-							{@const height = table.alto || 100}
-							{@const x = table.posicion_x ?? Math.random() * 200}
-							{@const y = table.posicion_y ?? Math.random() * 200}
-							{@const shape = table.forma || 'cuadrada'}
-							<div
-								draggable="true"
-								on:dragstart={(e) => handleTableDragStart(e, table)}
-								on:dragend={handleTableDragEnd}
-								class="absolute cursor-move border-2 bg-card hover:bg-accent transition-all flex flex-col items-center justify-center text-center shadow-lg group select-none {isDragging &&
-								draggedTable?.id === table.id
-									? 'opacity-50 border-primary/50'
-									: 'border-primary'}"
-								style="left: {x}px; top: {y}px; width: {width}px; height: {height}px; {shape ===
-								'redonda'
-									? 'border-radius: 50%;'
-									: 'border-radius: 0.5rem;'}"
-								role="button"
-								tabindex="0"
-							>
-								<div class="font-bold text-xl text-foreground">Mesa {table.numero}</div>
-								<div class="text-sm text-muted-foreground">{table.capacidad || 4} personas</div>
-
-								<!-- Botones de acción -->
-								<div
-									class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1"
-								>
+				<div class="inline-block bg-background rounded-lg border border-border p-2">
+					<!-- Grid de celdas -->
+					<div class="grid gap-1" style="grid-template-columns: repeat({GRID_COLS}, {CELL_SIZE}px);">
+						{#each Array(GRID_ROWS) as _, row}
+							{#each Array(GRID_COLS) as _, col}
+								{@const tableInCell = isTableInCell(row, col, zoneTables)}
+								{@const isTableOrigin = tableInCell && tableInCell.posicion_y === row && tableInCell.posicion_x === col}
+								
+								{#if isTableOrigin}
+									<!-- Celda con mesa (origen) -->
+									{@const width = (tableInCell.ancho || 1)}
+									{@const height = (tableInCell.alto || 1)}
 									<button
-										on:click|stopPropagation={() => openTableModal(table)}
-										class="p-2 bg-background/90 hover:bg-accent rounded-lg shadow-md"
-										title="Editar"
+										on:click={() => handleCellClick(row, col)}
+										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-sm group relative"
+										style="width: {width * CELL_SIZE + (width - 1) * 4}px; height: {height * CELL_SIZE + (height - 1) * 4}px; grid-column: span {width}; grid-row: span {height};"
+										title="Mesa {tableInCell.numero}"
 									>
-										<Edit2 class="h-4 w-4" />
+										<div class="text-lg">{tableInCell.numero}</div>
+										<div class="text-xs opacity-90">{tableInCell.capacidad || 4}p</div>
+										
+										<!-- Botones de acción -->
+										<div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+											<button
+												on:click|stopPropagation={() => openTableModal(tableInCell)}
+												class="p-1 bg-background/90 hover:bg-accent rounded shadow-md"
+												title="Editar"
+											>
+												<Edit2 class="h-3 w-3" />
+											</button>
+											<button
+												on:click|stopPropagation={() => deleteTable(tableInCell.id)}
+												class="p-1 bg-background/90 hover:bg-destructive/10 text-destructive rounded shadow-md"
+												title="Eliminar"
+											>
+												<Trash2 class="h-3 w-3" />
+											</button>
+										</div>
 									</button>
+								{:else if !tableInCell}
+									<!-- Celda vacía -->
 									<button
-										on:click|stopPropagation={() => deleteTable(table.id)}
-										class="p-2 bg-background/90 hover:bg-destructive/10 text-destructive rounded-lg shadow-md"
-										title="Eliminar"
+										on:click={() => handleCellClick(row, col)}
+										class="bg-muted/50 hover:bg-accent border border-border rounded transition-colors"
+										style="width: {CELL_SIZE}px; height: {CELL_SIZE}px;"
+										title="Agregar mesa en ({row}, {col})"
 									>
-										<Trash2 class="h-4 w-4" />
+										<div class="w-full h-full flex items-center justify-center opacity-0 hover:opacity-50 transition-opacity">
+											<Plus class="h-4 w-4" />
+										</div>
 									</button>
-								</div>
-
-								<!-- Indicador de arrastre -->
-								<div class="absolute bottom-2 left-0 right-0 flex justify-center opacity-50">
-									<div class="flex gap-1">
-										<div class="w-1 h-1 bg-current rounded-full"></div>
-										<div class="w-1 h-1 bg-current rounded-full"></div>
-										<div class="w-1 h-1 bg-current rounded-full"></div>
-									</div>
-								</div>
-							</div>
+								{/if}
+							{/each}
 						{/each}
-					{/if}
+					</div>
 				</div>
 			</div>
 		{:else}
