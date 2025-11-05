@@ -1,5 +1,6 @@
 <script>
-	export let class: string = '';
+	let className = '';
+	export { className as class };
 </script>
 
 <svg
@@ -12,7 +13,7 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	class={class}
+	class={className}
 >
 	<path d="M5 12h14" />
 </svg>
