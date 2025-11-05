@@ -53,7 +53,7 @@
 		{
 			key: 'cantidad_actual',
 			label: 'Stock',
-			format: (val, row) => `${val} ${row.unidad}`,
+			format: (val, row) => `${val} ${row.unit}`,
 			align: 'center'
 		},
 		{
@@ -240,7 +240,7 @@
 				>
 					<option value="">Todas las categorías</option>
 					{#each categorias as categoria}
-						<option value={categoria.id}>{categoria.nombre}</option>
+						<option value={categoria.id}>{categoria.name}</option>
 					{/each}
 				</select>
 			</div>
@@ -277,10 +277,10 @@
 							{#each productos as producto}
 								{@const status = getStockStatus(producto)}
 								<tr class="border-b border-border hover:bg-accent transition-colors">
-									<td class="py-3 px-4 font-medium">{producto.nombre}</td>
-									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.categoria}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.cantidad_actual} {producto.unidad}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.stock_minimo || 0} {producto.unidad}</td>
+									<td class="py-3 px-4 font-medium">{producto.name}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.category}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.cantidad_actual} {producto.unit}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.stock_minimo || 0} {producto.unit}</td>
 									<td class="py-3 px-4 text-right text-sm">S/ {producto.costo_promedio.toFixed(2)}</td>
 									<td class="py-3 px-4 text-center">
 										<Badge variant={status.variant}>{status.label}</Badge>
@@ -324,16 +324,14 @@
 				</div>
 
 				<div class="space-y-2">
-					<label class="text-sm font-medium">Categoría *</label>
-					<select bind:value={formData.categoria} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-						<option value="">Seleccione una categoría</option>
-						{#each categorias as categoria}
-							<option value={categoria.id}>{categoria.nombre}</option>
-						{/each}
-					</select>
-				</div>
-
-				<div class="grid grid-cols-2 gap-4">
+				<label class="text-sm font-medium">Categoría *</label>
+				<select bind:value={formData.categoria} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+					<option value="">Seleccione una categoría</option>
+					{#each categorias as categoria}
+						<option value={categoria.id}>{categoria.name}</option>
+					{/each}
+				</select>
+			</div>				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
 						<label class="text-sm font-medium">Unidad *</label>
 						<select bind:value={formData.unidad} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
@@ -397,36 +395,34 @@
 <!-- Modal Ajustar Stock -->
 {#if showAjusteModal}
 	<Dialog open={showAjusteModal} onClose={() => (showAjusteModal = false)}>
-		<div class="space-y-6">
-			<div>
-				<h2 class="text-lg font-semibold">Ajustar Stock: {selectedProducto?.nombre || ''}</h2>
+	<div class="space-y-6">
+		<div>
+			<h2 class="text-lg font-semibold">Ajustar Stock: {selectedProducto?.name || ''}</h2>
+		</div>
+
+		<form on:submit|preventDefault={handleAjuste} class="space-y-4">
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Tipo de Ajuste *</label>
+				<select bind:value={ajusteData.tipo_ajuste} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+					<option value="entrada">Entrada (Agregar)</option>
+					<option value="salida">Salida (Reducir)</option>
+				</select>
 			</div>
 
-			<form on:submit|preventDefault={handleAjuste} class="space-y-4">
-				<div class="space-y-2">
-					<label class="text-sm font-medium">Tipo de Ajuste *</label>
-					<select bind:value={ajusteData.tipo_ajuste} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-						<option value="entrada">Entrada (Agregar)</option>
-						<option value="salida">Salida (Reducir)</option>
-					</select>
-				</div>
-
-				<div class="space-y-2">
-					<label class="text-sm font-medium">Cantidad *</label>
-					<Input
-						type="number"
-						bind:value={ajusteData.cantidad}
-						step="0.01"
-						min="0.01"
-						required
-						placeholder="0.00"
-					/>
-					<p class="text-xs text-muted-foreground">
-						Stock actual: {selectedProducto?.cantidad_actual || 0} {selectedProducto?.unidad || ''}
-					</p>
-				</div>
-
-				<div class="space-y-2">
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Cantidad *</label>
+				<Input
+					type="number"
+					bind:value={ajusteData.cantidad}
+					step="0.01"
+					min="0.01"
+					required
+					placeholder="0.00"
+				/>
+				<p class="text-xs text-muted-foreground">
+					Stock actual: {selectedProducto?.cantidad_actual || 0} {selectedProducto?.unit || ''}
+				</p>
+			</div>				<div class="space-y-2">
 					<label class="text-sm font-medium">Razón del Ajuste *</label>
 					<textarea
 						bind:value={ajusteData.razon}
