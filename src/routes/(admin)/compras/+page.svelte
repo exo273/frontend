@@ -46,7 +46,7 @@
 		{
 			key: 'proveedor',
 			label: 'Proveedor',
-			format: (val) => val?.nombre || '-'
+			format: (val) => val?.name || '-'
 		},
 		{
 			key: 'detalles',
@@ -88,7 +88,7 @@
 
 	async function loadProveedores() {
 		try {
-			const response = await apiService.getSuppliers({ activo: true });
+			const response = await apiService.getSuppliers({ is_active: true });
 			proveedores = response.results || response;
 		} catch (error) {
 			console.error('Error al cargar proveedores:', error);
@@ -125,20 +125,18 @@
 			return;
 		}
 
-		const producto = productos.find((p) => p.id === parseInt(newItem.producto));
-		formData.detalles = [
-			...formData.detalles,
-			{
-				producto: newItem.producto,
-				producto_nombre: producto?.nombre || '',
-				producto_unidad: producto?.unidad || '',
-				cantidad: newItem.cantidad,
-				costo_unitario: newItem.costo_unitario,
-				subtotal: newItem.cantidad * newItem.costo_unitario
-			}
-		];
-
-		// Reset new item
+	const producto = productos.find((p) => p.id === parseInt(newItem.producto));
+	formData.detalles = [
+		...formData.detalles,
+		{
+			producto: newItem.producto,
+			producto_nombre: producto?.name || '',
+			producto_unidad: producto?.unit || '',
+			cantidad: newItem.cantidad,
+			costo_unitario: newItem.costo_unitario,
+			subtotal: newItem.cantidad * newItem.costo_unitario
+		}
+	];		// Reset new item
 		newItem = {
 			producto: '',
 			cantidad: 0,
@@ -237,17 +235,17 @@
 						</thead>
 						<tbody>
 							{#each compras as compra}
-								<tr class="border-b border-border hover:bg-accent transition-colors">
-									<td class="py-3 px-4 text-sm">{new Date(compra.fecha_compra).toLocaleDateString('es-PE')}</td>
-									<td class="py-3 px-4 font-medium">{compra.numero_factura}</td>
-									<td class="py-3 px-4 text-sm">{compra.proveedor?.nombre || '-'}</td>
-									<td class="py-3 px-4 text-center text-sm">{compra.detalles?.length || 0}</td>
-									<td class="py-3 px-4 text-right font-medium">S/ {parseFloat(compra.total || 0).toFixed(2)}</td>
-									<td class="py-3 px-4 text-sm text-muted-foreground">{new Date(compra.fecha_creacion).toLocaleString('es-PE')}</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
+							<tr class="border-b border-border hover:bg-accent transition-colors">
+								<td class="py-3 px-4 text-sm">{new Date(compra.fecha_compra).toLocaleDateString('es-PE')}</td>
+								<td class="py-3 px-4 font-medium">{compra.numero_factura}</td>
+								<td class="py-3 px-4 text-sm">{compra.proveedor?.name || '-'}</td>
+								<td class="py-3 px-4 text-center text-sm">{compra.detalles?.length || 0}</td>
+								<td class="py-3 px-4 text-right font-medium">S/ {parseFloat(compra.total || 0).toFixed(2)}</td>
+								<td class="py-3 px-4 text-sm text-muted-foreground">{new Date(compra.fecha_creacion).toLocaleString('es-PE')}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
 				</div>
 			{/if}
 		</CardContent>
@@ -270,17 +268,15 @@
 					</h4>
 
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<div class="space-y-2">
-							<label class="text-sm font-medium">Proveedor *</label>
-							<select bind:value={formData.proveedor} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-								<option value="">Seleccione...</option>
-								{#each proveedores as proveedor}
-									<option value={proveedor.id}>{proveedor.nombre}</option>
-								{/each}
-							</select>
-						</div>
-
-						<div class="space-y-2">
+		<div class="space-y-2">
+			<label class="text-sm font-medium">Proveedor *</label>
+			<select bind:value={formData.proveedor} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+				<option value="">Seleccione...</option>
+				{#each proveedores as proveedor}
+					<option value={proveedor.id}>{proveedor.name}</option>
+				{/each}
+			</select>
+		</div>						<div class="space-y-2">
 							<label class="text-sm font-medium">Fecha *</label>
 							<Input type="date" bind:value={formData.fecha_compra} required />
 						</div>
@@ -303,17 +299,15 @@
 					</h4>
 
 					<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-						<div class="space-y-2 md:col-span-5">
-							<label class="text-sm font-medium">Producto</label>
-							<select bind:value={newItem.producto} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-								<option value="">Seleccione...</option>
-								{#each productos as producto}
-									<option value={producto.id}>{producto.nombre} ({producto.unidad})</option>
-								{/each}
-							</select>
-						</div>
-
-						<div class="space-y-2 md:col-span-2">
+		<div class="space-y-2 md:col-span-5">
+			<label class="text-sm font-medium">Producto</label>
+			<select bind:value={newItem.producto} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+				<option value="">Seleccione...</option>
+				{#each productos as producto}
+					<option value={producto.id}>{producto.name} ({producto.unit})</option>
+				{/each}
+			</select>
+		</div>						<div class="space-y-2 md:col-span-2">
 							<label class="text-sm font-medium">Cantidad</label>
 							<Input type="number" bind:value={newItem.cantidad} step="0.01" min="0" />
 						</div>
