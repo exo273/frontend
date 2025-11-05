@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { apiService } from '$lib/api';
 	import { toast } from '$lib/stores';
-	import Button from '$lib/components/ui/Button.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Edit2 from '$lib/components/icons/Edit2.svelte';
 	import Trash2 from '$lib/components/icons/Trash2.svelte';
@@ -177,9 +176,13 @@
 					<h2 class="text-xl font-bold">Zonas</h2>
 					<p class="text-sm text-muted-foreground">Gestiona tus zonas</p>
 				</div>
-				<Button size="sm" on:click={() => openZoneModal()}>
+				<button
+					on:click={() => openZoneModal()}
+					class="flex items-center justify-center h-9 w-9 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+					title="Nueva Zona"
+				>
 					<Plus class="h-4 w-4" />
-				</Button>
+				</button>
 			</div>
 		</div>
 
@@ -255,10 +258,13 @@
 							Arrastra las mesas para posicionarlas • {zoneTables.length} mesas
 						</p>
 					</div>
-					<Button on:click={() => openTableModal()}>
-						<Plus class="h-4 w-4 mr-2" />
+					<button
+						on:click={() => openTableModal()}
+						class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+					>
+						<Plus class="h-4 w-4" />
 						Nueva Mesa
-					</Button>
+					</button>
 				</div>
 			</div>
 
