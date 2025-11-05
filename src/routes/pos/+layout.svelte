@@ -28,7 +28,7 @@
 	}
 
 	function goToZonesConfig() {
-		goto('/configuracion?tab=zones');
+		goto('/pos/configuracion');
 	}
 
 	function handleLogout() {
