@@ -9,6 +9,8 @@
 	export let zone = null; // Si es null, es creación; si tiene datos, es edición
 	export let mode = 'create'; // 'create' o 'edit'
 
+	$: console.log('🟡 ZoneModal - show cambió a:', show);
+
 	const dispatch = createEventDispatcher();
 
 	let formData = {
@@ -66,7 +68,7 @@
 </script>
 
 <Dialog
-	bind:show
+	bind:open={show}
 	title={mode === 'edit' ? 'Editar Zona' : 'Nueva Zona'}
 	description={mode === 'edit'
 		? 'Modifica los datos de la zona'

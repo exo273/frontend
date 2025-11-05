@@ -94,7 +94,7 @@
 </script>
 
 <Dialog
-	bind:show
+	bind:open={show}
 	title={mode === 'edit' ? 'Editar Mesa' : 'Nueva Mesa'}
 	description={mode === 'edit' ? 'Modifica los datos de la mesa' : 'Crea una nueva mesa'}
 	on:close={handleClose}
