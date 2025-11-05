@@ -233,11 +233,16 @@
 									</td>
 									<td class="py-3 px-4 text-right">
 										<div class="flex items-center justify-end gap-2">
-											<Button variant="ghost" size="sm" on:click={() => openEditModal(proveedor)}>
+											<Button variant="ghost" size="sm" on:click={() => openEditModal(proveedor)} title="Editar proveedor">
 												<Edit class="h-4 w-4" />
 											</Button>
-											<Button variant="ghost" size="sm" on:click={() => toggleProveedorStatus(proveedor)}>
-												<Activity class="h-4 w-4" />
+											<Button 
+												variant={proveedor.is_active ? 'ghost' : 'default'} 
+												size="sm" 
+												on:click={() => toggleProveedorStatus(proveedor)}
+												title={proveedor.is_active ? 'Desactivar proveedor' : 'Activar proveedor'}
+											>
+												{proveedor.is_active ? 'Desactivar' : 'Activar'}
 											</Button>
 										</div>
 									</td>
