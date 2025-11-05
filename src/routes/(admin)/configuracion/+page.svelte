@@ -42,6 +42,15 @@
 	let loading = false;
 	let saving = false;
 
+	// Detectar tab desde URL query params
+	$: {
+		const urlParams = new URLSearchParams($page.url.search);
+		const tabParam = urlParams.get('tab');
+		if (tabParam && tabs.some(t => t.id === tabParam)) {
+			activeTab = tabParam;
+		}
+	}
+
 	// Datos de configuración del restaurante
 	let restaurantConfig = {
 		name: '',

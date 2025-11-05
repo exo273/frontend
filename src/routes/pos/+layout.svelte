@@ -6,6 +6,7 @@
 	import ShoppingBag from '$lib/components/icons/ShoppingBag.svelte';
 	import User from '$lib/components/icons/User.svelte';
 	import LogOut from '$lib/components/icons/LogOut.svelte';
+	import Settings from '$lib/components/icons/Settings.svelte';
 
 	let currentUser = null;
 
@@ -24,6 +25,10 @@
 
 	function backToAdmin() {
 		window.location.href = '/';
+	}
+
+	function goToZonesConfig() {
+		goto('/configuracion?tab=zones');
 	}
 
 	function handleLogout() {
@@ -66,6 +71,18 @@
 						<span class="font-semibold">{currentUser.username}</span>
 					</div>
 				{/if}
+				
+				<div class="h-6 w-px bg-border"></div>
+				
+				<button 
+					class="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-lg transition-colors text-sm font-medium" 
+					on:click={goToZonesConfig}
+					title="Configurar zonas y mesas"
+				>
+					<Settings class="h-4 w-4" />
+					<span>Zonas y Mesas</span>
+				</button>
+				
 				<button 
 					class="flex items-center gap-2 px-3 py-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors text-sm font-medium" 
 					on:click={handleLogout}
