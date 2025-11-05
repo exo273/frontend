@@ -15,6 +15,7 @@
 	let loading = true;
 	let searchQuery = '';
 	let orderMode = 'mesas'; // 'mesas', 'mostrador', 'para-llevar'
+	let isGroupingMode = false; // Modo de agrupación de mesas
 
 	// Order state
 	let orderItems = [];
@@ -117,6 +118,18 @@
 			</button>
 		</div>
 		<div class="flex items-center gap-4">
+			<button
+				on:click={() => (isGroupingMode = !isGroupingMode)}
+				class="px-4 py-2 font-medium transition-colors rounded-lg border {isGroupingMode
+					? 'bg-primary text-primary-foreground border-primary'
+					: 'bg-muted text-foreground border-border hover:bg-accent'}"
+				title={isGroupingMode ? 'Desactivar modo agrupación' : 'Activar modo agrupación'}
+			>
+				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6v12M16 6v12" />
+				</svg>
+			</button>
 			<div class="relative">
 				<input
 					type="text"
@@ -139,13 +152,13 @@
 		<div class="flex-1 flex flex-col">
 			<!-- Tabs de Zonas - solo visible en modo mesas -->
 			{#if orderMode === 'mesas'}
-				<div class="bg-background flex items-center gap-2 p-2">
+				<div class="bg-sidebar border-b border-border flex items-center gap-2 px-4 py-2">
 					{#each zones as zone}
 						<button
 							on:click={() => (selectedZone = zone.id)}
 							class="px-6 py-3 font-medium transition-colors rounded-lg {selectedZone === zone.id
-								? 'bg-sidebar text-foreground'
-								: 'text-muted-foreground hover:text-foreground hover:bg-muted'}"
+								? 'bg-primary text-primary-foreground'
+								: 'text-foreground hover:bg-muted'}"
 						>
 							{zone.nombre}
 						</button>
