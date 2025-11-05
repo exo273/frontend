@@ -229,8 +229,13 @@ export const apiService = {
 
 	// Mesas y Zonas (POS)
 	getZones: () => posClient.get('/api/pos/zones/'),
+	createZone: (data) => posClient.post('/api/pos/zones/', data),
+	updateZone: (id, data) => posClient.patch(`/api/pos/zones/${id}/`, data),
+	deleteZone: (id) => posClient.delete(`/api/pos/zones/${id}/`),
 	getTables: (params) => posClient.get('/api/pos/tables/', params),
+	createTable: (data) => posClient.post('/api/pos/tables/', data),
 	updateTable: (id, data) => posClient.patch(`/api/pos/tables/${id}/`, data),
+	deleteTable: (id) => posClient.delete(`/api/pos/tables/${id}/`),
 	updateTableStatus: (id, status) => posClient.post(`/api/pos/tables/${id}/update_status/`, { status }),
 	getTablesSummary: () => posClient.get('/api/pos/tables/status_summary/'),
 

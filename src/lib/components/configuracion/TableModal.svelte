@@ -1,0 +1,244 @@
+<script>
+	import { createEventDispatcher } from 'svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import { apiService } from '$lib/api';
+	import { toast } from '$lib/stores';
+
+	export let show = false;
+	export let table = null; // Si es null, es creación; si tiene datos, es edición
+	export let mode = 'create'; // 'create' o 'edit'
+	export let zones = []; // Lista de zonas disponibles
+
+	const dispatch = createEventDispatcher();
+
+	let formData = {
+		numero: '',
+		zona: '',
+		capacidad: 4,
+		posicion_x: 0,
+		posicion_y: 0,
+		ancho: 100,
+		alto: 100,
+		forma: 'cuadrada',
+		is_active: true
+	};
+
+	let loading = false;
+
+	$: if (table && mode === 'edit') {
+		formData = {
+			numero: table.numero || '',
+			zona: table.zona?.id || table.zona || '',
+			capacidad: table.capacidad || 4,
+			posicion_x: table.posicion_x || 0,
+			posicion_y: table.posicion_y || 0,
+			ancho: table.ancho || 100,
+			alto: table.alto || 100,
+			forma: table.forma || 'cuadrada',
+			is_active: table.is_active !== undefined ? table.is_active : true
+		};
+	} else if (mode === 'create') {
+		formData = {
+			numero: '',
+			zona: zones.length > 0 ? zones[0].id : '',
+			capacidad: 4,
+			posicion_x: 0,
+			posicion_y: 0,
+			ancho: 100,
+			alto: 100,
+			forma: 'cuadrada',
+			is_active: true
+		};
+	}
+
+	async function handleSubmit() {
+		// Validación
+		if (!formData.numero) {
+			toast.error('El número de mesa es requerido');
+			return;
+		}
+		if (!formData.zona) {
+			toast.error('Debe seleccionar una zona');
+			return;
+		}
+
+		loading = true;
+		try {
+			const dataToSend = {
+				...formData,
+				numero: String(formData.numero)
+			};
+
+			if (mode === 'edit' && table) {
+				await apiService.updateTable(table.id, dataToSend);
+				toast.success('Mesa actualizada correctamente');
+			} else {
+				await apiService.createTable(dataToSend);
+				toast.success('Mesa creada correctamente');
+			}
+			dispatch('saved');
+			handleClose();
+		} catch (error) {
+			console.error('Error al guardar mesa:', error);
+			toast.error(error.response?.data?.detail || 'Error al guardar mesa');
+		} finally {
+			loading = false;
+		}
+	}
+
+	function handleClose() {
+		show = false;
+		dispatch('close');
+	}
+</script>
+
+<Dialog
+	bind:show
+	title={mode === 'edit' ? 'Editar Mesa' : 'Nueva Mesa'}
+	description={mode === 'edit' ? 'Modifica los datos de la mesa' : 'Crea una nueva mesa'}
+	on:close={handleClose}
+>
+	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+		<div class="grid grid-cols-2 gap-4">
+			<!-- Número de Mesa -->
+			<div>
+				<label for="table-number" class="block text-sm font-medium mb-2">
+					Número <span class="text-error-500">*</span>
+				</label>
+				<input
+					id="table-number"
+					type="text"
+					bind:value={formData.numero}
+					placeholder="1, 2, A1..."
+					class="input w-full"
+					required
+				/>
+			</div>
+
+			<!-- Zona -->
+			<div>
+				<label for="table-zone" class="block text-sm font-medium mb-2">
+					Zona <span class="text-error-500">*</span>
+				</label>
+				<select id="table-zone" bind:value={formData.zona} class="select w-full" required>
+					<option value="">Seleccionar zona...</option>
+					{#each zones as zone}
+						<option value={zone.id}>{zone.nombre}</option>
+					{/each}
+				</select>
+			</div>
+
+			<!-- Capacidad -->
+			<div>
+				<label for="table-capacity" class="block text-sm font-medium mb-2">
+					Capacidad
+				</label>
+				<input
+					id="table-capacity"
+					type="number"
+					bind:value={formData.capacidad}
+					min="1"
+					max="20"
+					class="input w-full"
+				/>
+			</div>
+
+			<!-- Forma -->
+			<div>
+				<label for="table-shape" class="block text-sm font-medium mb-2">
+					Forma
+				</label>
+				<select id="table-shape" bind:value={formData.forma} class="select w-full">
+					<option value="cuadrada">Cuadrada</option>
+					<option value="rectangular">Rectangular</option>
+					<option value="redonda">Redonda</option>
+				</select>
+			</div>
+		</div>
+
+		<!-- Dimensiones -->
+		<div class="border-t pt-4">
+			<h4 class="text-sm font-semibold mb-3">Dimensiones y Posición</h4>
+			<div class="grid grid-cols-2 gap-4">
+				<div>
+					<label for="table-width" class="block text-sm font-medium mb-2">
+						Ancho (px)
+					</label>
+					<input
+						id="table-width"
+						type="number"
+						bind:value={formData.ancho}
+						min="50"
+						max="300"
+						step="10"
+						class="input w-full"
+					/>
+				</div>
+
+				<div>
+					<label for="table-height" class="block text-sm font-medium mb-2">
+						Alto (px)
+					</label>
+					<input
+						id="table-height"
+						type="number"
+						bind:value={formData.alto}
+						min="50"
+						max="300"
+						step="10"
+						class="input w-full"
+					/>
+				</div>
+
+				<div>
+					<label for="table-x" class="block text-sm font-medium mb-2">
+						Posición X
+					</label>
+					<input
+						id="table-x"
+						type="number"
+						bind:value={formData.posicion_x}
+						step="10"
+						class="input w-full"
+					/>
+				</div>
+
+				<div>
+					<label for="table-y" class="block text-sm font-medium mb-2">
+						Posición Y
+					</label>
+					<input
+						id="table-y"
+						type="number"
+						bind:value={formData.posicion_y}
+						step="10"
+						class="input w-full"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<!-- Estado Activo -->
+		<div class="flex items-center gap-2">
+			<input
+				id="table-active"
+				type="checkbox"
+				bind:checked={formData.is_active}
+				class="checkbox"
+			/>
+			<label for="table-active" class="text-sm font-medium">
+				Mesa activa
+			</label>
+		</div>
+	</form>
+
+	<div slot="footer" class="flex gap-2">
+		<Button variant="outline" on:click={handleClose} disabled={loading}>
+			Cancelar
+		</Button>
+		<Button on:click={handleSubmit} disabled={loading}>
+			{loading ? 'Guardando...' : mode === 'edit' ? 'Actualizar' : 'Crear Mesa'}
+		</Button>
+	</div>
+</Dialog>

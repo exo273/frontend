@@ -9,6 +9,7 @@
 	import Users from '$lib/components/icons/Users.svelte';
 	import Wallet from '$lib/components/icons/Wallet.svelte';
 	import Printer from '$lib/components/icons/Printer.svelte';
+	import LayoutGrid from '$lib/components/icons/LayoutGrid.svelte';
 	import Upload from '$lib/components/icons/Upload.svelte';
 	import Image from '$lib/components/icons/Image.svelte';
 	import Loader from '$lib/components/icons/Loader.svelte';
@@ -19,6 +20,8 @@
 	import RoleModal from '$lib/components/configuracion/RoleModal.svelte';
 	import PaymentMethodModal from '$lib/components/configuracion/PaymentMethodModal.svelte';
 	import PrinterModal from '$lib/components/configuracion/PrinterModal.svelte';
+	import ZoneModal from '$lib/components/configuracion/ZoneModal.svelte';
+	import TableModal from '$lib/components/configuracion/TableModal.svelte';
 
 	// Obtener token del store
 	let accessToken;
@@ -31,7 +34,8 @@
 		{ id: 'restaurant', label: 'Mi Restaurante', icon: Home },
 		{ id: 'users', label: 'Usuarios y Roles', icon: Users },
 		{ id: 'payments', label: 'Métodos de Pago', icon: Wallet },
-		{ id: 'printers', label: 'Impresoras', icon: Printer }
+		{ id: 'printers', label: 'Impresoras', icon: Printer },
+		{ id: 'zones', label: 'Zonas y Mesas', icon: LayoutGrid }
 	];
 
 	let activeTab = 'restaurant';
@@ -75,6 +79,19 @@
 	let showPrinterModal = false;
 	let editingPrinter = null;
 
+	// Tab 5 - Zonas y Mesas
+	let zones = [];
+	let tables = [];
+	let showZoneModal = false;
+	let showTableModal = false;
+	let editingZone = null;
+	let editingTable = null;
+	let zoneModalMode = 'create';
+	let tableModalMode = 'create';
+	let selectedZoneForView = null;
+	let draggedTable = null;
+	let isDragging = false;
+
 	onMount(async () => {
 		loading = true;
 		try {
@@ -84,7 +101,9 @@
 				loadUsers(),
 				loadRoles(),
 				loadPaymentMethods(),
-				loadPrinters()
+				loadPrinters(),
+				loadZones(),
+				loadTables()
 			]);
 		} catch (error) {
 			console.error('Error al cargar datos iniciales:', error);
@@ -628,6 +647,136 @@
 			console.error('Error:', error);
 			toast.error('Error al actualizar estado');
 		}
+	}
+
+	// ============================================================================
+	// TAB 5: ZONAS Y MESAS
+	// ============================================================================
+
+	async function loadZones() {
+		try {
+			zones = await apiService.getZones();
+			if (zones.length > 0 && !selectedZoneForView) {
+				selectedZoneForView = zones[0].id;
+			}
+		} catch (error) {
+			console.error('Error al cargar zonas:', error);
+			toast.error('Error al cargar zonas');
+		}
+	}
+
+	async function loadTables() {
+		try {
+			const response = await apiService.getTables({ page_size: 1000 });
+			tables = response.results || response;
+		} catch (error) {
+			console.error('Error al cargar mesas:', error);
+			toast.error('Error al cargar mesas');
+		}
+	}
+
+	function openZoneModal(zone = null) {
+		editingZone = zone;
+		zoneModalMode = zone ? 'edit' : 'create';
+		showZoneModal = true;
+	}
+
+	async function handleSaveZone() {
+		await loadZones();
+		await loadTables();
+	}
+
+	async function deleteZone(zoneId) {
+		if (!confirm('¿Estás seguro de eliminar esta zona? Se eliminarán todas sus mesas.')) {
+			return;
+		}
+
+		try {
+			await apiService.deleteZone(zoneId);
+			toast.success('Zona eliminada exitosamente');
+			await loadZones();
+			await loadTables();
+		} catch (error) {
+			console.error('Error al eliminar zona:', error);
+			toast.error('Error al eliminar zona');
+		}
+	}
+
+	function openTableModal(table = null) {
+		editingTable = table;
+		tableModalMode = table ? 'edit' : 'create';
+		showTableModal = true;
+	}
+
+	async function handleSaveTable() {
+		await loadTables();
+	}
+
+	async function deleteTable(tableId) {
+		if (!confirm('¿Estás seguro de eliminar esta mesa?')) {
+			return;
+		}
+
+		try {
+			await apiService.deleteTable(tableId);
+			toast.success('Mesa eliminada exitosamente');
+			await loadTables();
+		} catch (error) {
+			console.error('Error al eliminar mesa:', error);
+			toast.error('Error al eliminar mesa');
+		}
+	}
+
+	function getTablesByZone(zoneId) {
+		return tables.filter((t) => (t.zona?.id || t.zona) === zoneId);
+	}
+
+	// Drag & Drop functions
+	function handleTableDragStart(event, table) {
+		draggedTable = table;
+		isDragging = true;
+		event.dataTransfer.effectAllowed = 'move';
+	}
+
+	function handleTableDrag(event) {
+		if (!draggedTable) return;
+		// Puedes agregar lógica adicional aquí si es necesario
+	}
+
+	function handleTableDragEnd(event) {
+		isDragging = false;
+		draggedTable = null;
+	}
+
+	async function handleTableDrop(event) {
+		event.preventDefault();
+		if (!draggedTable) return;
+
+		const canvas = event.currentTarget;
+		const rect = canvas.getBoundingClientRect();
+		const x = Math.max(0, Math.min(event.clientX - rect.left - 50, rect.width - 100));
+		const y = Math.max(0, Math.min(event.clientY - rect.top - 50, rect.height - 100));
+
+		try {
+			await apiService.updateTable(draggedTable.id, {
+				...draggedTable,
+				zona: draggedTable.zona?.id || draggedTable.zona,
+				posicion_x: Math.round(x / 10) * 10,
+				posicion_y: Math.round(y / 10) * 10
+			});
+			await loadTables();
+		} catch (error) {
+			console.error('Error al actualizar posición:', error);
+			toast.error('Error al mover mesa');
+		}
+
+		isDragging = false;
+		draggedTable = null;
+	}
+
+	function handleDragOver(event) {
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'move';
 	}
 </script>
 
@@ -1293,6 +1442,174 @@
 							</div>
 						{/if}
 					</div>
+				{:else if activeTab === 'zones'}
+					<div class="p-6">
+						<div class="mb-6">
+							<h2 class="text-lg font-semibold mb-1">Zonas y Mesas</h2>
+							<p class="text-sm text-muted-foreground">
+								Configura las zonas de tu restaurante y organiza las mesas con drag & drop
+							</p>
+						</div>
+
+						<!-- Selector de zona -->
+						<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+							<!-- Panel izquierdo: Gestión de zonas -->
+							<div class="lg:col-span-1 space-y-4">
+								<div class="flex items-center justify-between mb-4">
+									<h3 class="font-semibold">Zonas</h3>
+									<button
+										on:click={() => openZoneModal()}
+										class="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+									>
+										<Plus class="h-4 w-4" />
+										Nueva Zona
+									</button>
+								</div>
+
+								<div class="space-y-2">
+									{#each zones as zone}
+										<div
+											class="p-4 border rounded-lg transition-colors cursor-pointer {selectedZoneForView ===
+											zone.id
+												? 'border-primary bg-primary/5'
+												: 'border-border hover:border-primary/50'}"
+											on:click={() => (selectedZoneForView = zone.id)}
+											role="button"
+											tabindex="0"
+										>
+											<div class="flex items-center justify-between mb-2">
+												<h4 class="font-semibold">{zone.nombre}</h4>
+												<div class="flex items-center gap-1">
+													<button
+														on:click|stopPropagation={() => openZoneModal(zone)}
+														class="p-1.5 hover:bg-accent rounded transition-colors"
+														title="Editar"
+													>
+														<Edit2 class="h-3.5 w-3.5" />
+													</button>
+													<button
+														on:click|stopPropagation={() => deleteZone(zone.id)}
+														class="p-1.5 hover:bg-destructive/10 text-destructive rounded transition-colors"
+														title="Eliminar"
+													>
+														<Trash2 class="h-3.5 w-3.5" />
+													</button>
+												</div>
+											</div>
+											{#if zone.descripcion}
+												<p class="text-xs text-muted-foreground">{zone.descripcion}</p>
+											{/if}
+											<div class="mt-2 flex items-center gap-2 text-xs">
+												<span class="text-muted-foreground">
+													{getTablesByZone(zone.id).length} mesas
+												</span>
+												{#if !zone.is_active}
+													<span class="px-2 py-0.5 bg-muted rounded text-muted-foreground">
+														Inactiva
+													</span>
+												{/if}
+											</div>
+										</div>
+									{/each}
+
+									{#if zones.length === 0}
+										<div class="text-center py-8 text-muted-foreground">
+											<p>No hay zonas creadas</p>
+											<p class="text-sm mt-1">Crea tu primera zona</p>
+										</div>
+									{/if}
+								</div>
+							</div>
+
+							<!-- Panel derecho: Canvas de mesas con drag & drop -->
+							<div class="lg:col-span-2">
+								{#if selectedZoneForView}
+									{@const selectedZone = zones.find((z) => z.id === selectedZoneForView)}
+									{@const zoneTables = getTablesByZone(selectedZoneForView)}
+									<div class="border rounded-lg overflow-hidden">
+										<div class="bg-muted p-4 border-b flex items-center justify-between">
+											<div>
+												<h3 class="font-semibold">{selectedZone?.nombre}</h3>
+												<p class="text-sm text-muted-foreground">
+													Arrastra las mesas para posicionarlas
+												</p>
+											</div>
+											<button
+												on:click={() => openTableModal()}
+												class="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+											>
+												<Plus class="h-4 w-4" />
+												Nueva Mesa
+											</button>
+										</div>
+
+										<!-- Canvas de mesas -->
+										<div
+											class="relative bg-background"
+											style="height: 600px; width: 100%;"
+											on:drop={handleTableDrop}
+											on:dragover={handleDragOver}
+											role="application"
+										>
+											{#each zoneTables as table}
+												<div
+													draggable="true"
+													on:dragstart={(e) => handleTableDragStart(e, table)}
+													on:drag={handleTableDrag}
+													on:dragend={handleTableDragEnd}
+													class="absolute cursor-move border-2 border-primary bg-card hover:bg-accent transition-colors rounded-lg flex flex-col items-center justify-center text-center shadow-md group"
+													style="left: {table.posicion_x}px; top: {table.posicion_y}px; width: {table.ancho}px; height: {table.alto}px; {table.forma ===
+													'redonda'
+														? 'border-radius: 50%;'
+														: ''}"
+													role="button"
+													tabindex="0"
+												>
+													<div class="font-semibold text-lg">Mesa {table.numero}</div>
+													<div class="text-xs text-muted-foreground">
+														{table.capacidad} personas
+													</div>
+													<div
+														class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1"
+													>
+														<button
+															on:click|stopPropagation={() => openTableModal(table)}
+															class="p-1 bg-background/90 hover:bg-accent rounded text-foreground"
+															title="Editar"
+														>
+															<Edit2 class="h-3 w-3" />
+														</button>
+														<button
+															on:click|stopPropagation={() => deleteTable(table.id)}
+															class="p-1 bg-background/90 hover:bg-destructive/10 text-destructive rounded"
+															title="Eliminar"
+														>
+															<Trash2 class="h-3 w-3" />
+														</button>
+													</div>
+												</div>
+											{/each}
+
+											{#if zoneTables.length === 0}
+												<div
+													class="absolute inset-0 flex items-center justify-center text-muted-foreground"
+												>
+													<div class="text-center">
+														<p class="text-lg">No hay mesas en esta zona</p>
+														<p class="text-sm mt-1">Crea una mesa para comenzar</p>
+													</div>
+												</div>
+											{/if}
+										</div>
+									</div>
+								{:else}
+									<div class="border rounded-lg p-12 text-center text-muted-foreground">
+										<p>Selecciona una zona para ver sus mesas</p>
+									</div>
+								{/if}
+							</div>
+						</div>
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -1308,3 +1625,16 @@
 	on:save={handleSavePayment}
 />
 <PrinterModal bind:open={showPrinterModal} printer={editingPrinter} on:save={handleSavePrinter} />
+<ZoneModal
+	bind:show={showZoneModal}
+	zone={editingZone}
+	mode={zoneModalMode}
+	on:saved={handleSaveZone}
+/>
+<TableModal
+	bind:show={showTableModal}
+	table={editingTable}
+	mode={tableModalMode}
+	{zones}
+	on:saved={handleSaveTable}
+/>
