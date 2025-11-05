@@ -24,24 +24,24 @@
 
 	// Form data
 	let formData = {
-		nombre: '',
-		ruc: '',
-		direccion: '',
-		telefono: '',
+		name: '',
+		rut: '',
+		address: '',
+		phone: '',
 		email: '',
-		contacto_nombre: '',
-		activo: true
+		contact_person: '',
+		is_active: true
 	};
 
 	// Columnas de la tabla - sin emojis
 	const columns = [
-		{ key: 'nombre', label: 'Proveedor' },
-		{ key: 'ruc', label: 'RUC' },
-		{ key: 'telefono', label: 'Teléfono' },
+		{ key: 'name', label: 'Proveedor' },
+		{ key: 'rut', label: 'RUT' },
+		{ key: 'phone', label: 'Teléfono' },
 		{ key: 'email', label: 'Email' },
-		{ key: 'contacto_nombre', label: 'Contacto' },
+		{ key: 'contact_person', label: 'Contacto' },
 		{
-			key: 'activo',
+			key: 'is_active',
 			label: 'Estado',
 			align: 'center'
 		}
@@ -86,13 +86,13 @@
 	function openCreateModal() {
 		modalMode = 'create';
 		formData = {
-			nombre: '',
-			ruc: '',
-			direccion: '',
-			telefono: '',
+			name: '',
+			rut: '',
+			address: '',
+			phone: '',
 			email: '',
-			contacto_nombre: '',
-			activo: true
+			contact_person: '',
+			is_active: true
 		};
 		showModal = true;
 	}
@@ -108,10 +108,10 @@
 		try {
 			await apiService.updateSupplier(proveedor.id, {
 				...proveedor,
-				activo: !proveedor.activo
+				is_active: !proveedor.is_active
 			});
 			toast.success(
-				`Proveedor ${!proveedor.activo ? 'activado' : 'desactivado'} exitosamente`
+				`Proveedor ${!proveedor.is_active ? 'activado' : 'desactivado'} exitosamente`
 			);
 			await loadProveedores();
 		} catch (error) {
@@ -249,19 +249,19 @@
 					<div class="space-y-2">
 						<label class="text-sm font-medium">Nombre / Razón Social *</label>
 						<Input
-							bind:value={formData.nombre}
+							bind:value={formData.name}
 							required
 							placeholder="Nombre del proveedor"
 						/>
 					</div>
 
 					<div class="space-y-2">
-						<label class="text-sm font-medium">RUC *</label>
+						<label class="text-sm font-medium">RUT *</label>
 						<Input
-							bind:value={formData.ruc}
+							bind:value={formData.rut}
 							required
-							maxlength="11"
-							placeholder="12345678901"
+							maxlength="12"
+							placeholder="12.345.678-9"
 						/>
 					</div>
 				</div>
@@ -269,7 +269,7 @@
 				<div class="space-y-2">
 					<label class="text-sm font-medium">Dirección</label>
 					<Input
-						bind:value={formData.direccion}
+						bind:value={formData.address}
 						placeholder="Dirección completa"
 					/>
 				</div>
@@ -279,8 +279,8 @@
 						<label class="text-sm font-medium">Teléfono</label>
 						<Input
 							type="tel"
-							bind:value={formData.telefono}
-							placeholder="+51 999 999 999"
+							bind:value={formData.phone}
+							placeholder="+56 9 1234 5678"
 						/>
 					</div>
 
@@ -289,7 +289,7 @@
 						<Input
 							type="email"
 							bind:value={formData.email}
-							placeholder="email@proveedor.com"
+							placeholder="email@proveedor.cl"
 						/>
 					</div>
 				</div>
@@ -297,13 +297,13 @@
 				<div class="space-y-2">
 					<label class="text-sm font-medium">Nombre de Contacto</label>
 					<Input
-						bind:value={formData.contacto_nombre}
+						bind:value={formData.contact_person}
 						placeholder="Nombre del contacto principal"
 					/>
 				</div>
 
 				<label class="flex items-center space-x-2">
-					<input type="checkbox" bind:checked={formData.activo} class="h-4 w-4 rounded border-input" />
+					<input type="checkbox" bind:checked={formData.is_active} class="h-4 w-4 rounded border-input" />
 					<span class="text-sm font-medium">Proveedor Activo</span>
 				</label>
 
