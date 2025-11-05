@@ -132,8 +132,26 @@
 		return tables.filter((t) => (t.zona?.id || t.zona) === zoneId);
 	}
 
+	// Función para obtener el siguiente número de mesa disponible
+	function getNextTableNumber(zoneTables) {
+		if (zoneTables.length === 0) return '1';
+		
+		// Obtener todos los números de mesa como números
+		const numbers = zoneTables
+			.map(t => {
+				const num = parseInt(t.numero);
+				return isNaN(num) ? 0 : num;
+			})
+			.filter(n => n > 0)
+			.sort((a, b) => a - b);
+		
+		// Encontrar el siguiente número disponible
+		if (numbers.length === 0) return '1';
+		return String(numbers[numbers.length - 1] + 1);
+	}
+
 	// Grid functions
-	function handleCellClick(row, col) {
+	async function handleCellClick(row, col) {
 		// Verificar si hay una mesa en esta celda
 		const zoneTables = getTablesByZone(selectedZone);
 		const tableInCell = zoneTables.find(
@@ -144,8 +162,40 @@
 			// Si hay una mesa, abrir modal para editar
 			openTableModal(tableInCell);
 		} else {
-			// Si no hay mesa, abrir modal para crear
-			openTableModal(null, row, col);
+			// Si no hay mesa, crear automáticamente con número consecutivo
+			await createTableAutomatically(row, col);
+		}
+	}
+
+	// Crear mesa automáticamente sin modal
+	async function createTableAutomatically(row, col) {
+		if (!selectedZone) {
+			toast.error('Selecciona una zona primero');
+			return;
+		}
+
+		const zoneTables = getTablesByZone(selectedZone);
+		const nextNumber = getNextTableNumber(zoneTables);
+
+		try {
+			const newTable = {
+				numero: nextNumber,
+				zona: selectedZone,
+				capacidad: 4,
+				posicion_x: col,
+				posicion_y: row,
+				ancho: 1,
+				alto: 1,
+				forma: 'cuadrada',
+				is_active: true
+			};
+
+			await apiService.createTable(newTable);
+			toast.success(`Mesa ${nextNumber} creada`);
+			await loadData();
+		} catch (error) {
+			console.error('Error al crear mesa:', error);
+			toast.error('Error al crear mesa');
 		}
 	}
 
