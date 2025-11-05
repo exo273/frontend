@@ -90,12 +90,6 @@
 	<!-- Header -->
 	<div class="bg-sidebar border-b border-border px-6 py-3 flex items-center justify-between">
 		<div class="flex items-center gap-4">
-			<button
-				on:click={() => goto('/admin')}
-				class="text-foreground hover:text-muted-foreground transition-colors"
-			>
-				← Admin
-			</button>
 			<h1 class="text-xl font-semibold text-foreground">Mesas</h1>
 		</div>
 		<div class="flex items-center gap-4">
@@ -120,13 +114,13 @@
 		<!-- Main Content - Tables -->
 		<div class="flex-1 flex flex-col">
 			<!-- Tabs de Zonas -->
-			<div class="bg-muted flex items-center border-b border-border">
+			<div class="bg-background flex items-center gap-2 p-2">
 				{#each zones as zone}
 					<button
 						on:click={() => (selectedZone = zone.id)}
-						class="px-6 py-3 font-medium transition-colors border-b-2 {selectedZone === zone.id
-							? 'bg-background text-foreground border-primary'
-							: 'text-muted-foreground hover:text-foreground hover:bg-background/50 border-transparent'}"
+						class="px-6 py-3 font-medium transition-colors rounded-lg {selectedZone === zone.id
+							? 'bg-sidebar text-foreground'
+							: 'text-muted-foreground hover:text-foreground hover:bg-muted'}"
 					>
 						{zone.nombre}
 					</button>
