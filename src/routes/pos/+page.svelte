@@ -14,6 +14,7 @@
 	let selectedTable = null;
 	let loading = true;
 	let searchQuery = '';
+	let orderMode = 'mesas'; // 'mesas', 'mostrador', 'para-llevar'
 
 	// Order state
 	let orderItems = [];
@@ -89,8 +90,31 @@
 <div class="h-screen flex flex-col bg-background">
 	<!-- Header -->
 	<div class="bg-sidebar border-b border-border px-6 py-3 flex items-center justify-between">
-		<div class="flex items-center gap-4">
-			<h1 class="text-xl font-semibold text-foreground">Mesas</h1>
+		<div class="flex items-center gap-2">
+			<button
+				on:click={() => (orderMode = 'mesas')}
+				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'mesas'
+					? 'bg-primary text-primary-foreground'
+					: 'text-foreground hover:bg-muted'}"
+			>
+				Mesas
+			</button>
+			<button
+				on:click={() => (orderMode = 'mostrador')}
+				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'mostrador'
+					? 'bg-primary text-primary-foreground'
+					: 'text-foreground hover:bg-muted'}"
+			>
+				Mostrador
+			</button>
+			<button
+				on:click={() => (orderMode = 'para-llevar')}
+				class="px-4 py-2 font-medium transition-colors rounded-lg {orderMode === 'para-llevar'
+					? 'bg-primary text-primary-foreground'
+					: 'text-foreground hover:bg-muted'}"
+			>
+				Para llevar
+			</button>
 		</div>
 		<div class="flex items-center gap-4">
 			<div class="relative">
@@ -113,66 +137,86 @@
 	<div class="flex-1 flex overflow-hidden">
 		<!-- Main Content - Tables -->
 		<div class="flex-1 flex flex-col">
-			<!-- Tabs de Zonas -->
-			<div class="bg-background flex items-center gap-2 p-2">
-				{#each zones as zone}
-					<button
-						on:click={() => (selectedZone = zone.id)}
-						class="px-6 py-3 font-medium transition-colors rounded-lg {selectedZone === zone.id
-							? 'bg-sidebar text-foreground'
-							: 'text-muted-foreground hover:text-foreground hover:bg-muted'}"
-					>
-						{zone.nombre}
-					</button>
-				{/each}
-			</div>
+			<!-- Tabs de Zonas - solo visible en modo mesas -->
+			{#if orderMode === 'mesas'}
+				<div class="bg-background flex items-center gap-2 p-2">
+					{#each zones as zone}
+						<button
+							on:click={() => (selectedZone = zone.id)}
+							class="px-6 py-3 font-medium transition-colors rounded-lg {selectedZone === zone.id
+								? 'bg-sidebar text-foreground'
+								: 'text-muted-foreground hover:text-foreground hover:bg-muted'}"
+						>
+							{zone.nombre}
+						</button>
+					{/each}
+				</div>
+			{/if}
 
-			<!-- Canvas de Mesas -->
+			<!-- Canvas de Mesas o vista de productos -->
 			<div class="flex-1 p-6 overflow-auto relative bg-background">
-				{#if loading}
-					<div class="flex items-center justify-center h-full">
-						<div class="text-muted-foreground">Cargando mesas...</div>
-					</div>
-				{:else if zoneTables.length === 0}
+				{#if orderMode === 'mesas'}
+					{#if loading}
+						<div class="flex items-center justify-center h-full">
+							<div class="text-muted-foreground">Cargando mesas...</div>
+						</div>
+					{:else if zoneTables.length === 0}
+						<div class="flex items-center justify-center h-full">
+							<div class="text-center text-muted-foreground">
+								<p class="text-lg mb-2">No hay mesas en esta zona</p>
+								<p class="text-sm">Configura tus zonas y mesas primero</p>
+							</div>
+						</div>
+					{:else}
+						<div class="relative" style="min-height: 600px; min-width: 1000px;">
+							{#each zoneTables as table}
+								{@const pos = getTablePosition(table)}
+								{@const statusClass = getTableClass(table)}
+								<button
+									on:click={() => selectTable(table)}
+									class="absolute flex flex-col items-center justify-center font-bold text-white shadow-lg transition-all hover:scale-105 border-2 {statusClass === 'selected'
+										? 'bg-yellow-500 border-yellow-600'
+										: statusClass === 'occupied'
+											? 'bg-destructive border-destructive'
+											: statusClass === 'reserved'
+												? 'bg-blue-500 border-blue-600'
+												: 'bg-primary border-primary'}"
+									style="left: {pos.x}px; top: {pos.y}px; width: {pos.width}px; height: {pos.height}px; {pos.shape ===
+									'redonda'
+										? 'border-radius: 50%;'
+										: 'border-radius: 0.5rem;'}"
+								>
+									<span class="text-2xl">{table.numero}</span>
+								</button>
+							{/each}
+						</div>
+					{/if}
+				{:else}
+					<!-- Vista de catálogo de productos para Mostrador y Para llevar -->
 					<div class="flex items-center justify-center h-full">
 						<div class="text-center text-muted-foreground">
-							<p class="text-lg mb-2">No hay mesas en esta zona</p>
-							<p class="text-sm">Configura tus zonas y mesas primero</p>
+							<p class="text-lg mb-2">Catálogo de productos</p>
+							<p class="text-sm">Próximamente disponible</p>
 						</div>
-					</div>
-				{:else}
-					<div class="relative" style="min-height: 600px; min-width: 1000px;">
-						{#each zoneTables as table}
-							{@const pos = getTablePosition(table)}
-							{@const statusClass = getTableClass(table)}
-							<button
-								on:click={() => selectTable(table)}
-								class="absolute flex flex-col items-center justify-center font-bold text-white shadow-lg transition-all hover:scale-105 border-2 {statusClass === 'selected'
-									? 'bg-yellow-500 border-yellow-600'
-									: statusClass === 'occupied'
-										? 'bg-destructive border-destructive'
-										: statusClass === 'reserved'
-											? 'bg-blue-500 border-blue-600'
-											: 'bg-primary border-primary'}"
-								style="left: {pos.x}px; top: {pos.y}px; width: {pos.width}px; height: {pos.height}px; {pos.shape ===
-								'redonda'
-									? 'border-radius: 50%;'
-									: 'border-radius: 0.5rem;'}"
-							>
-								<span class="text-2xl">{table.numero}</span>
-							</button>
-						{/each}
 					</div>
 				{/if}
 			</div>
 		</div>
 
 		<!-- Sidebar Derecho - Orden -->
-		{#if selectedTable}
+		{#if selectedTable || orderMode !== 'mesas'}
 			<div class="w-96 bg-card border-l border-border flex flex-col shadow-xl">
 				<!-- Header de la Mesa -->
 				<div class="bg-primary text-primary-foreground px-6 py-4 flex items-center justify-between">
-					<h2 class="text-2xl font-bold">MESA {selectedTable.numero}</h2>
+					<h2 class="text-2xl font-bold">
+						{#if orderMode === 'mesas'}
+							MESA {selectedTable?.numero || ''}
+						{:else if orderMode === 'mostrador'}
+							MOSTRADOR
+						{:else}
+							PARA LLEVAR
+						{/if}
+					</h2>
 					<button
 						on:click={closeOrder}
 						class="p-2 hover:bg-primary/90 rounded-lg transition-colors"
@@ -183,33 +227,35 @@
 
 				<!-- Formulario de Orden -->
 				<div class="flex-1 overflow-auto p-6 space-y-4">
-					<!-- Personas -->
-					<div>
-						<label class="block text-foreground font-medium mb-2">
-							Personas <span class="text-destructive">*</span>
-						</label>
-						<div class="flex items-center gap-2">
-							<button
-								on:click={() => customerCount > 1 && customerCount--}
-								class="p-2 bg-background border border-input rounded-lg hover:bg-accent transition-colors"
-								disabled={customerCount <= 1}
-							>
-								<Minus class="h-5 w-5 text-foreground" />
-							</button>
-							<input
-								type="number"
-								bind:value={customerCount}
-								min="1"
-								class="flex-1 px-4 py-2 border-2 border-input bg-background text-foreground rounded-lg text-center font-bold text-xl focus:outline-none focus:ring-2 focus:ring-ring"
-							/>
-							<button
-								on:click={() => customerCount++}
-								class="p-2 bg-background border border-input rounded-lg hover:bg-accent transition-colors"
-							>
-								<Plus class="h-5 w-5 text-foreground" />
-							</button>
+					<!-- Personas - solo para mesas -->
+					{#if orderMode === 'mesas'}
+						<div>
+							<label class="block text-foreground font-medium mb-2">
+								Personas <span class="text-destructive">*</span>
+							</label>
+							<div class="flex items-center gap-2">
+								<button
+									on:click={() => customerCount > 1 && customerCount--}
+									class="p-2 bg-background border border-input rounded-lg hover:bg-accent transition-colors"
+									disabled={customerCount <= 1}
+								>
+									<Minus class="h-5 w-5 text-foreground" />
+								</button>
+								<input
+									type="number"
+									bind:value={customerCount}
+									min="1"
+									class="flex-1 px-4 py-2 border-2 border-input bg-background text-foreground rounded-lg text-center font-bold text-xl focus:outline-none focus:ring-2 focus:ring-ring"
+								/>
+								<button
+									on:click={() => customerCount++}
+									class="p-2 bg-background border border-input rounded-lg hover:bg-accent transition-colors"
+								>
+									<Plus class="h-5 w-5 text-foreground" />
+								</button>
+							</div>
 						</div>
-					</div>
+					{/if}
 
 					<!-- Cliente -->
 					<div>
@@ -246,11 +292,15 @@
 						/>
 					</div>
 
-					<!-- Botón Abrir Mesa -->
+					<!-- Botón Abrir Mesa/Orden -->
 					<button
 						class="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-lg transition-colors shadow-lg text-lg"
 					>
-						Abrir mesa
+						{#if orderMode === 'mesas'}
+							Abrir mesa
+						{:else}
+							Nueva orden
+						{/if}
 					</button>
 
 					<!-- Items de la Orden (cuando esté implementado) -->
