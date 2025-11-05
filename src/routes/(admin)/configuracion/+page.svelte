@@ -69,11 +69,24 @@
 	let editingPrinter = null;
 
 	onMount(async () => {
-		await loadRestaurantConfig();
+		loading = true;
+		try {
+			// Cargar todos los datos en paralelo
+			await Promise.all([
+				loadRestaurantConfig(),
+				loadUsers(),
+				loadRoles(),
+				loadPaymentMethods(),
+				loadPrinters()
+			]);
+		} catch (error) {
+			console.error('Error al cargar datos iniciales:', error);
+		} finally {
+			loading = false;
+		}
 	});
 
 	async function loadRestaurantConfig() {
-		loading = true;
 		try {
 			const response = await fetch('/api/operaciones/config/', {
 				headers: {
@@ -104,8 +117,6 @@
 		} catch (error) {
 			console.error('Error al cargar configuración:', error);
 			toast.error('Error al cargar la configuración');
-		} finally {
-			loading = false;
 		}
 	}
 
@@ -176,14 +187,7 @@
 
 	function selectTab(tabId) {
 		activeTab = tabId;
-		if (tabId === 'users') {
-			loadUsers();
-			loadRoles();
-		} else if (tabId === 'payments') {
-			loadPaymentMethods();
-		} else if (tabId === 'printers') {
-			loadPrinters();
-		}
+		// Ya no es necesario cargar datos aquí porque se cargan en onMount
 	}
 
 	// ============================================================================
@@ -375,7 +379,6 @@
 	// ============================================================================
 
 	async function loadPaymentMethods() {
-		loading = true;
 		try {
 			const response = await fetch('/api/pos/config/payment-methods/', {
 				headers: {
@@ -392,8 +395,6 @@
 		} catch (error) {
 			console.error('Error:', error);
 			paymentMethods = [];
-		} finally {
-			loading = false;
 		}
 	}
 
@@ -501,7 +502,6 @@
 	// ============================================================================
 
 	async function loadPrinters() {
-		loading = true;
 		try {
 			const response = await fetch('/api/pos/config/printers/', {
 				headers: {
@@ -518,8 +518,6 @@
 		} catch (error) {
 			console.error('Error:', error);
 			printers = [];
-		} finally {
-			loading = false;
 		}
 	}
 
