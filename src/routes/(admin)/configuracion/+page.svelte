@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { toast } from '$lib/stores';
+	import { auth, toast } from '$lib/stores';
 	import { apiService } from '$lib/api';
 	import Settings from '$lib/components/icons/Settings.svelte';
 	import Home from '$lib/components/icons/Home.svelte';
@@ -18,6 +18,12 @@
 	import RoleModal from '$lib/components/configuracion/RoleModal.svelte';
 	import PaymentMethodModal from '$lib/components/configuracion/PaymentMethodModal.svelte';
 	import PrinterModal from '$lib/components/configuracion/PrinterModal.svelte';
+
+	// Obtener token del store
+	let accessToken;
+	auth.subscribe(state => {
+		accessToken = state.accessToken;
+	});
 
 	// Pestañas de configuración
 	const tabs = [
@@ -90,7 +96,7 @@
 		try {
 			const response = await fetch('/api/operaciones/config/', {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -142,7 +148,7 @@
 			const response = await fetch('/api/operaciones/config/1/', {
 				method: 'PATCH',
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: formData
 			});
@@ -198,7 +204,7 @@
 		try {
 			const response = await fetch('/api/auth/users/', {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -214,7 +220,7 @@
 		try {
 			const response = await fetch('/api/auth/roles/', {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -261,7 +267,7 @@
 			const response = await fetch(url, {
 				method,
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: formData
 			});
@@ -291,7 +297,7 @@
 			const response = await fetch(`/api/auth/users/${userId}/`, {
 				method: 'DELETE',
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -325,7 +331,7 @@
 				method,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: JSON.stringify({
 					name: data.name,
@@ -357,7 +363,7 @@
 			const response = await fetch(`/api/auth/roles/${roleId}/`, {
 				method: 'DELETE',
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -382,7 +388,7 @@
 		try {
 			const response = await fetch('/api/pos/config/payment-methods/', {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -426,7 +432,7 @@
 			const response = await fetch(url, {
 				method,
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: formData
 			});
@@ -457,7 +463,7 @@
 			const response = await fetch(`/api/pos/config/payment-methods/${paymentId}/`, {
 				method: 'DELETE',
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -480,7 +486,7 @@
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: JSON.stringify({ is_active: !currentState })
 			});
@@ -505,7 +511,7 @@
 		try {
 			const response = await fetch('/api/pos/config/printers/', {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -554,7 +560,7 @@
 				method,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: JSON.stringify(body)
 			});
@@ -583,7 +589,7 @@
 			const response = await fetch(`/api/pos/config/printers/${printerId}/`, {
 				method: 'DELETE',
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				}
 			});
 
@@ -606,7 +612,7 @@
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('access_token')}`
+					Authorization: `Bearer ${accessToken}`
 				},
 				body: JSON.stringify({ is_active: !currentState })
 			});
