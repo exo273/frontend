@@ -74,32 +74,32 @@
 					</svg>
 				</button>
 
-				<!-- Header -->
-				{#if title || description}
-					<div class="flex flex-col space-y-1.5 text-center sm:text-left">
-						{#if title}
-							<h2 id="dialog-title" class="text-lg font-semibold leading-none tracking-tight">
-								{title}
-							</h2>
-						{/if}
-						{#if description}
-							<p id="dialog-description" class="text-sm text-muted-foreground">
-								{description}
-							</p>
-						{/if}
+			<!-- Header -->
+			{#if title || description}
+				<div class="flex flex-col space-y-1.5 text-center sm:text-left">
+					{#if title}
+						<h2 id="dialog-title" class="text-lg font-semibold leading-none tracking-tight">
+							{title}
+						</h2>
 					{/if}
-				{/if}
+					{#if description}
+						<p id="dialog-description" class="text-sm text-muted-foreground">
+							{description}
+						</p>
+					{/if}
+				</div>
+			{/if}
 
-				<!-- Content Slot -->
-				<slot />
+			<!-- Content Slot -->
+			<slot />
 
-				<!-- Footer Slot -->
-				{#if $$slots.footer}
-					<div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-						<slot name="footer" />
-					</div>
-				{/if}
-			</div>
+			<!-- Footer Slot -->
+			{#if $$slots.footer}
+				<div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+					<slot name="footer" />
+				</div>
+			{/if}
 		</div>
 	</div>
+</div>
 {/if}
