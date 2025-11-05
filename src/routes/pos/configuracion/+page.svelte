@@ -36,8 +36,10 @@
 		loading = true;
 		try {
 			zones = await apiService.getZones();
+			console.log('📍 Zonas cargadas:', zones);
 			const response = await apiService.getTables({ page_size: 1000 });
 			tables = response.results || response;
+			console.log('📍 Mesas cargadas:', tables);
 			
 			if (zones.length > 0 && !selectedZone) {
 				selectedZone = zones[0].id;
