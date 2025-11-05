@@ -650,10 +650,10 @@
 				{#each tabs as tab}
 					<button
 						on:click={() => selectTab(tab.id)}
-						class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors {activeTab ===
-						tab.id
-							? 'bg-primary text-primary-foreground'
-							: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+						class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors
+							{activeTab === tab.id
+								? 'bg-primary text-primary-foreground'
+								: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
 					>
 						<svelte:component this={tab.icon} className="h-5 w-5" />
 						{tab.label}
