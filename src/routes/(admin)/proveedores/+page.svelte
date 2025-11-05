@@ -210,7 +210,7 @@
 						<thead>
 							<tr class="border-b border-border">
 								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Proveedor</th>
-								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">RUC</th>
+								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">RUT</th>
 								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Teléfono</th>
 								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
 								<th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Contacto</th>
@@ -221,14 +221,14 @@
 						<tbody>
 							{#each proveedores as proveedor}
 								<tr class="border-b border-border hover:bg-accent transition-colors">
-									<td class="py-3 px-4 font-medium">{proveedor.nombre}</td>
-									<td class="py-3 px-4 text-sm text-muted-foreground">{proveedor.ruc}</td>
-									<td class="py-3 px-4 text-sm">{proveedor.telefono || '-'}</td>
+									<td class="py-3 px-4 font-medium">{proveedor.name}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{proveedor.rut}</td>
+									<td class="py-3 px-4 text-sm">{proveedor.phone || '-'}</td>
 									<td class="py-3 px-4 text-sm">{proveedor.email || '-'}</td>
-									<td class="py-3 px-4 text-sm">{proveedor.contacto_nombre || '-'}</td>
+									<td class="py-3 px-4 text-sm">{proveedor.contact_person || '-'}</td>
 									<td class="py-3 px-4 text-center">
-										<Badge variant={proveedor.activo ? 'success' : 'secondary'}>
-											{proveedor.activo ? 'Activo' : 'Inactivo'}
+										<Badge variant={proveedor.is_active ? 'success' : 'secondary'}>
+											{proveedor.is_active ? 'Activo' : 'Inactivo'}
 										</Badge>
 									</td>
 									<td class="py-3 px-4 text-right">
