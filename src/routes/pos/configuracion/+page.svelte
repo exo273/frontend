@@ -24,13 +24,9 @@
 	let tableModalMode = 'create';
 	
 	// Grid configuration
-	const GRID_ROWS = 12;  // Aumentado de 8 a 12
-	const GRID_COLS = 16;  // Aumentado de 12 a 16
+	const GRID_ROWS = 8;
+	const GRID_COLS = 12;
 	const CELL_SIZE = 80; // px
-	
-	// Drag & Drop state
-	let draggedTable = null;
-	let isDragging = false;
 
 	onMount(async () => {
 		console.log('🟣 Componente configuración montado');
@@ -188,8 +184,6 @@
 				capacidad: 4,
 				posicion_x: col,
 				posicion_y: row,
-				ancho: 1,
-				alto: 1,
 				is_active: true
 			};
 
@@ -202,64 +196,6 @@
 			console.error('Respuesta del servidor:', error.response?.data);
 			toast.error(error.response?.data?.detail || error.response?.data?.message || 'Error al crear mesa');
 		}
-	}
-
-	// Drag & Drop functions
-	function handleTableDragStart(event, table) {
-		draggedTable = table;
-		isDragging = true;
-		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.setData('text/plain', table.id);
-	}
-
-	function handleTableDragEnd() {
-		isDragging = false;
-		draggedTable = null;
-	}
-
-	async function handleCellDrop(event, row, col) {
-		event.preventDefault();
-		
-		if (!draggedTable) return;
-
-		// Verificar si la celda de destino está ocupada
-		const zoneTables = getTablesByZone(selectedZone);
-		const tableInCell = isTableInCell(row, col, zoneTables);
-		
-		if (tableInCell && tableInCell.id !== draggedTable.id) {
-			toast.error('Esta celda ya está ocupada');
-			isDragging = false;
-			draggedTable = null;
-			return;
-		}
-
-		try {
-			const updateData = {
-				numero: draggedTable.numero,
-				zona: draggedTable.zona?.id || draggedTable.zona,
-				capacidad: draggedTable.capacidad || 4,
-				posicion_x: col,
-				posicion_y: row,
-				ancho: draggedTable.ancho || 1,
-				alto: draggedTable.alto || 1,
-				is_active: draggedTable.is_active
-			};
-
-			await apiService.updateTable(draggedTable.id, updateData);
-			toast.success('Mesa reposicionada');
-			await loadData();
-		} catch (error) {
-			console.error('Error al mover mesa:', error);
-			toast.error('Error al mover mesa');
-		}
-
-		isDragging = false;
-		draggedTable = null;
-	}
-
-	function handleDragOver(event) {
-		event.preventDefault();
-		event.dataTransfer.dropEffect = 'move';
 	}
 
 	function isTableInCell(row, col, zoneTables) {
@@ -398,31 +334,17 @@
 								{@const isTableOrigin = tableInCell && tableInCell.posicion_y === row && tableInCell.posicion_x === col}
 								
 								{#if isTableOrigin}
-									<!-- Celda con mesa (origen) - ARRASTRABLE -->
+									<!-- Celda con mesa (origen) -->
 									{@const width = (tableInCell.ancho || 1)}
 									{@const height = (tableInCell.alto || 1)}
-									<div
-										draggable="true"
-										on:dragstart={(e) => handleTableDragStart(e, tableInCell)}
-										on:dragend={handleTableDragEnd}
+									<button
 										on:click={() => handleCellClick(row, col)}
-										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-sm group relative cursor-move {isDragging && draggedTable?.id === tableInCell.id ? 'opacity-50' : ''}"
+										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-sm group relative"
 										style="width: {width * CELL_SIZE + (width - 1) * 4}px; height: {height * CELL_SIZE + (height - 1) * 4}px; grid-column: span {width}; grid-row: span {height};"
-										title="Mesa {tableInCell.numero} - Arrastra para mover"
-										role="button"
-										tabindex="0"
+										title="Mesa {tableInCell.numero}"
 									>
 										<div class="text-lg">{tableInCell.numero}</div>
 										<div class="text-xs opacity-90">{tableInCell.capacidad || 4}p</div>
-										
-										<!-- Indicador de drag -->
-										<div class="absolute bottom-1 left-0 right-0 flex justify-center opacity-50">
-											<div class="flex gap-0.5">
-												<div class="w-1 h-1 bg-current rounded-full"></div>
-												<div class="w-1 h-1 bg-current rounded-full"></div>
-												<div class="w-1 h-1 bg-current rounded-full"></div>
-											</div>
-										</div>
 										
 										<!-- Botones de acción -->
 										<div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
@@ -441,14 +363,12 @@
 												<Trash2 class="h-3 w-3" />
 											</button>
 										</div>
-									</div>
+									</button>
 								{:else if !tableInCell}
-									<!-- Celda vacía - DROP ZONE -->
+									<!-- Celda vacía -->
 									<button
 										on:click={() => handleCellClick(row, col)}
-										on:drop={(e) => handleCellDrop(e, row, col)}
-										on:dragover={handleDragOver}
-										class="bg-muted/50 hover:bg-accent border border-border rounded transition-colors {isDragging ? 'border-dashed border-primary/50' : ''}"
+										class="bg-muted/50 hover:bg-accent border border-border rounded transition-colors"
 										style="width: {CELL_SIZE}px; height: {CELL_SIZE}px;"
 										title="Agregar mesa en ({row}, {col})"
 									>
