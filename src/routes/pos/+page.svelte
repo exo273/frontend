@@ -70,10 +70,13 @@
 	}
 
 	function getTablePosition(table) {
-		const x = table.posicion_x ?? Math.random() * 500;
-		const y = table.posicion_y ?? Math.random() * 400;
-		const width = table.ancho || 100;
-		const height = table.alto || 100;
+		const CELL_SIZE = 80; // Mismo tamaño que en configuración
+		const x = (table.posicion_x ?? 0) * CELL_SIZE;
+		const y = (table.posicion_y ?? 0) * CELL_SIZE;
+		const cellWidth = table.ancho || 1;
+		const cellHeight = table.alto || 1;
+		const width = cellWidth * CELL_SIZE;
+		const height = cellHeight * CELL_SIZE;
 		const shape = table.forma || 'cuadrada';
 		return { x, y, width, height, shape };
 	}

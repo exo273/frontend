@@ -462,7 +462,10 @@
 											</button>
 										</div>
 									</div>
-								{:else if !tableInCell}
+								{:else if tableInCell}
+									<!-- Celda ocupada por una mesa (no es el origen) - NO RENDERIZAR NADA -->
+									<!-- Esta celda es parte de una mesa más grande, grid-column: span manejará el espacio -->
+								{:else}
 									<!-- Celda vacía - DROP ZONE -->
 									<button
 										on:click={() => handleCellClick(row, col)}
