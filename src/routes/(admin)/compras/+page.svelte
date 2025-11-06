@@ -151,9 +151,7 @@
 	function handleProductSelect() {
 		if (!newItem.producto) return;
 
-		// TODO: Re-enable when supplier categories are implemented in backend
-		// This feature auto-selects supplier based on product category
-		/*
+		// Auto-select supplier based on product category
 		// Encontrar el producto seleccionado
 		const productoSeleccionado = productos.find(p => p.id === parseInt(newItem.producto));
 		if (!productoSeleccionado || !productoSeleccionado.categoria) return;
@@ -168,7 +166,6 @@
 			formData.proveedor = proveedorSugerido.id;
 			toast.success(`Proveedor "${proveedorSugerido.name}" seleccionado automáticamente`);
 		}
-		*/
 	}
 
 	function getTotal() {

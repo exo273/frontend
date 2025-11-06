@@ -25,8 +25,8 @@
 	let modalMode = 'create';
 	let selectedProveedor = null;
 
-	// Feature flags - TODO: Enable when backend implements these endpoints
-	const ENABLE_SUPPLIER_CATEGORIES = false; // Set to true when /api/operaciones/proveedores/categories/ is implemented
+	// Feature flags
+	const ENABLE_SUPPLIER_CATEGORIES = true; // Backend implemented!
 
 	// Form data para categoría
 	let categoryFormData = {
