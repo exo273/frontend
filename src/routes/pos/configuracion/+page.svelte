@@ -250,7 +250,19 @@
 			await loadData();
 		} catch (error) {
 			console.error('Error al mover mesa:', error);
-			toast.error('Error al mover mesa');
+			// Intentar recargar de todos modos por si se guardó
+			try {
+				await loadData();
+				// Si la recarga funciona y la mesa está en la nueva posición, fue exitoso
+				const updatedTable = tables.find(t => t.id === draggedTable.id);
+				if (updatedTable && updatedTable.posicion_x === col && updatedTable.posicion_y === row) {
+					toast.success('Mesa reposicionada');
+				} else {
+					toast.error('Error al mover mesa');
+				}
+			} catch {
+				toast.error('Error al mover mesa');
+			}
 		}
 
 		isDragging = false;
