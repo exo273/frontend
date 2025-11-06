@@ -25,6 +25,9 @@
 	let modalMode = 'create';
 	let selectedProveedor = null;
 
+	// Feature flags - TODO: Enable when backend implements these endpoints
+	const ENABLE_SUPPLIER_CATEGORIES = false; // Set to true when /api/operaciones/proveedores/categories/ is implemented
+
 	// Form data para categorÃ­a
 	let categoryFormData = {
 		name: '',
@@ -78,7 +81,10 @@
 	];
 
 	onMount(async () => {
-		await Promise.all([loadProveedores(), loadSupplierCategories()]);
+		await loadProveedores();
+		if (ENABLE_SUPPLIER_CATEGORIES) {
+			await loadSupplierCategories();
+		}
 	});
 
 	async function loadProveedores() {
@@ -330,6 +336,7 @@
 					</div>
 				</div>
 
+				{#if ENABLE_SUPPLIER_CATEGORIES}
 				<div class="space-y-2">
 					<div class="flex items-center justify-between">
 						<label class="text-sm font-medium">CategorÃ­a</label>
@@ -352,6 +359,7 @@
 						{/each}
 					</select>
 				</div>
+				{/if}
 
 				<div class="space-y-2">
 					<label class="text-sm font-medium">DirecciÃ³n</label>
@@ -442,12 +450,12 @@
 		</div>
 	</Dialog>
 {/if}
-<!-- Modal para crear categoría de proveedor -->
-<Dialog bind:open={showCategoryModal} title="Nueva Categoría de Proveedor">
+<!-- Modal para crear categorï¿½a de proveedor -->
+<Dialog bind:open={showCategoryModal} title="Nueva Categorï¿½a de Proveedor">
 <div class="space-y-4">
 <form on:submit|preventDefault={handleCategorySubmit} class="space-y-4">
 <div class="space-y-2">
-<label class="text-sm font-medium">Nombre de la Categoría *</label>
+<label class="text-sm font-medium">Nombre de la Categorï¿½a *</label>
 <Input
 type="text"
 bind:value={categoryFormData.name}
@@ -458,12 +466,12 @@ autofocus
 </div>
 
 <div class="space-y-2">
-<label class="text-sm font-medium">Descripción</label>
+<label class="text-sm font-medium">Descripciï¿½n</label>
 <textarea
 bind:value={categoryFormData.description}
 rows="2"
 class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-placeholder="Descripción opcional de la categoría..."
+placeholder="Descripciï¿½n opcional de la categorï¿½a..."
 />
 </div>
 </form>
@@ -474,7 +482,7 @@ placeholder="Descripción opcional de la categoría..."
 Cancelar
 </Button>
 <Button on:click={handleCategorySubmit}>
-Crear Categoría
+Crear Categorï¿½a
 </Button>
 </div>
 </div>

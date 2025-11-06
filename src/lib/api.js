@@ -216,8 +216,17 @@ export const apiService = {
 	updateSupplier: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/${id}/`, data),
 	deleteSupplier: (id) => operacionesClient.delete(`/api/operaciones/proveedores/${id}/`),
 	
-	// Categorías de Proveedores
-	getSupplierCategories: () => operacionesClient.get('/api/operaciones/proveedores/categories/'),
+	// Categorías de Proveedores - TODO: Implementar en backend
+	// Por ahora retorna array vacío para evitar errores 404
+	getSupplierCategories: async () => {
+		try {
+			const response = await operacionesClient.get('/api/operaciones/proveedores/categories/');
+			return response;
+		} catch (error) {
+			console.warn('Supplier categories endpoint not implemented yet, returning empty array');
+			return [];
+		}
+	},
 	createSupplierCategory: (data) => operacionesClient.post('/api/operaciones/proveedores/categories/', data),
 	updateSupplierCategory: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/categories/${id}/`, data),
 	deleteSupplierCategory: (id) => operacionesClient.delete(`/api/operaciones/proveedores/categories/${id}/`),
