@@ -271,7 +271,6 @@
 				}
 			}, 100);
 		}
-		}
 
 		isDragging = false;
 		draggedTable = null;
