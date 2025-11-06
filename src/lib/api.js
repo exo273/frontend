@@ -204,6 +204,9 @@ export const apiService = {
 	deleteProducto: (id) => operacionesClient.delete(`/api/operaciones/productos/${id}/`),
 	adjustStock: (id, data) => operacionesClient.post(`/api/operaciones/productos/${id}/adjust_stock/`, data),
 
+	// Unidades de Medida
+	getUnitsOfMeasure: () => operacionesClient.get('/api/operaciones/unidades/?page_size=1000'),
+	
 	// Categorías de Productos (Inventario)
 	getCategorias: () => operacionesClient.get('/api/operaciones/categorias/?page_size=1000'),
 	createCategoria: (data) => operacionesClient.post('/api/operaciones/categorias/', data),

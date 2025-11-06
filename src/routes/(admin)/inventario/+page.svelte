@@ -23,6 +23,7 @@
 	let searchQuery = '';
 	let categoriaFilter = '';
 	let categorias = [];
+	let unitsOfMeasure = [];
 
 	// Modal states
 	let showModal = false;
@@ -41,7 +42,7 @@
 	let formData = {
 		nombre: '',
 		categoria: '',
-		unidad: 'kg',
+		unidad: '',
 		cantidad_actual: 0,
 		stock_minimo: 0,
 		costo_promedio: 0
@@ -111,6 +112,7 @@
 	onMount(async () => {
 		await loadProductos();
 		await loadCategorias();
+		await loadUnitsOfMeasure();
 	});
 
 	async function loadProductos() {
@@ -144,12 +146,23 @@
 		}
 	}
 
+	async function loadUnitsOfMeasure() {
+		try {
+			const response = await apiService.getUnitsOfMeasure();
+			unitsOfMeasure = response.results || response || [];
+			console.log('Unidades de medida cargadas:', unitsOfMeasure);
+		} catch (error) {
+			console.error('Error al cargar unidades de medida:', error);
+			unitsOfMeasure = [];
+		}
+	}
+
 	function openCreateModal() {
 		modalMode = 'create';
 		formData = {
 			nombre: '',
 			categoria: '',
-			unidad: 'kg',
+			unidad: '',
 			cantidad_actual: 0,
 			stock_minimo: 0,
 			costo_promedio: 0
@@ -176,18 +189,27 @@
 
 	async function handleSubmit() {
 		try {
+			// Transformar datos del formulario al formato del backend
+			const productData = {
+				name: formData.nombre || formData.name,
+				description: formData.descripcion || formData.description || '',
+				category: formData.categoria || formData.category,
+				inventory_unit: formData.unidad || formData.inventory_unit,
+				low_stock_threshold: formData.stock_minimo || formData.low_stock_threshold || 0
+			};
+
 			if (modalMode === 'create') {
-				await apiService.createProducto(formData);
+				await apiService.createProducto(productData);
 				toast.success('Producto creado exitosamente');
 			} else {
-				await apiService.updateProducto(selectedProducto.id, formData);
+				await apiService.updateProducto(selectedProducto.id, productData);
 				toast.success('Producto actualizado exitosamente');
 			}
 			showModal = false;
 			await loadProductos();
 		} catch (error) {
 			toast.error('Error al guardar producto');
-			console.error(error);
+			console.error('Error details:', error.response?.data || error);
 		}
 	}
 
@@ -383,11 +405,10 @@
 					<div class="space-y-2">
 						<label class="text-sm font-medium">Unidad *</label>
 						<select bind:value={formData.unidad} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-							<option value="kg">Kilogramos (kg)</option>
-							<option value="gr">Gramos (gr)</option>
-							<option value="lt">Litros (lt)</option>
-							<option value="ml">Mililitros (ml)</option>
-							<option value="unidad">Unidades</option>
+							<option value="">Seleccione una unidad</option>
+							{#each unitsOfMeasure as unit}
+								<option value={unit.id}>{unit.name} ({unit.abbreviation})</option>
+							{/each}
 						</select>
 					</div>
 
