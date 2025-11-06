@@ -204,7 +204,7 @@
 								{@const statusClass = getTableClass(table)}
 								<button
 									on:click={() => selectTable(table)}
-									class="absolute flex flex-col items-center justify-center font-bold text-white shadow-lg transition-all hover:scale-105 border-2 {statusClass === 'selected'
+									class="absolute flex flex-col items-center justify-center font-bold text-white shadow-lg transition-all hover:scale-105 border-4 {statusClass === 'selected'
 										? 'bg-yellow-500 border-yellow-600'
 										: statusClass === 'occupied'
 											? 'bg-destructive border-destructive'
@@ -216,7 +216,8 @@
 										? 'border-radius: 50%;'
 										: 'border-radius: 0.5rem;'}"
 								>
-									<span class="text-2xl">{table.numero}</span>
+									<span class="text-3xl font-bold drop-shadow-lg">{table.numero}</span>
+									<span class="text-xs opacity-90">{table.capacidad || 4}p</span>
 								</button>
 							{/each}
 						</div>

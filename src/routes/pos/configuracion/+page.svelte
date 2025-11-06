@@ -233,33 +233,47 @@
 			return;
 		}
 
+		// Actualizar inmediatamente en el estado local para feedback visual instantáneo
+		const tableIndex = tables.findIndex(t => t.id === draggedTable.id);
+		if (tableIndex !== -1) {
+			tables[tableIndex] = {
+				...tables[tableIndex],
+				posicion_x: col,
+				posicion_y: row
+			};
+			tables = tables; // Trigger reactivity
+		}
+
 		// Guardar el ID para verificación posterior
 		const tableId = draggedTable.id;
 		const targetRow = row;
 		const targetCol = col;
 
+		isDragging = false;
+		draggedTable = null;
+
 		try {
 			const updateData = {
-				numero: draggedTable.numero,
-				zona: draggedTable.zona?.id || draggedTable.zona,
-				capacidad: draggedTable.capacidad || 4,
+				numero: tables[tableIndex].numero,
+				zona: tables[tableIndex].zona?.id || tables[tableIndex].zona,
+				capacidad: tables[tableIndex].capacidad || 4,
 				posicion_x: col,
 				posicion_y: row,
-				ancho: draggedTable.ancho || 1,
-				alto: draggedTable.alto || 1,
-				is_active: draggedTable.is_active
+				ancho: tables[tableIndex].ancho || 1,
+				alto: tables[tableIndex].alto || 1,
+				is_active: tables[tableIndex].is_active
 			};
 
-			await apiService.updateTable(draggedTable.id, updateData);
+			await apiService.updateTable(tableId, updateData);
 			toast.success('Mesa reposicionada');
+			// Recargar para sincronizar con el servidor
 			await loadData();
 		} catch (error) {
 			console.error('Error al mover mesa:', error);
-			// El backend puede devolver error aunque se guardó (problema de Redis)
-			// Recargar y verificar si realmente se movió
+			// Revertir el cambio local si hay error
 			await loadData();
 			
-			// Esperar un momento para que tables se actualice
+			// Verificar si realmente se movió
 			setTimeout(() => {
 				const updatedTable = tables.find(t => t.id === tableId);
 				if (updatedTable && updatedTable.posicion_x === targetCol && updatedTable.posicion_y === targetRow) {
@@ -271,9 +285,6 @@
 				}
 			}, 100);
 		}
-
-		isDragging = false;
-		draggedTable = null;
 	}
 
 	function handleDragOver(event) {
@@ -410,7 +421,7 @@
 			<div class="flex-1 overflow-auto p-6 bg-muted/30">
 				<div class="inline-block bg-background rounded-lg border border-border p-2">
 					<!-- Grid de celdas -->
-					<div class="grid gap-1" style="grid-template-columns: repeat({GRID_COLS}, {CELL_SIZE}px);">
+					<div class="grid gap-2" style="grid-template-columns: repeat({GRID_COLS}, {CELL_SIZE}px);">
 						{#each Array(GRID_ROWS) as _, row}
 							{#each Array(GRID_COLS) as _, col}
 								{@const tableInCell = isTableInCell(row, col, zoneTables)}
@@ -426,13 +437,13 @@
 										on:dragend={handleTableDragEnd}
 										on:click={() => handleCellClick(row, col)}
 										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-sm group relative cursor-move {isDragging && draggedTable?.id === tableInCell.id ? 'opacity-50' : ''}"
-										style="width: {width * CELL_SIZE + (width - 1) * 4}px; height: {height * CELL_SIZE + (height - 1) * 4}px; grid-column: span {width}; grid-row: span {height};"
+										style="width: {width * CELL_SIZE + (width - 1) * 8}px; height: {height * CELL_SIZE + (height - 1) * 8}px; grid-column: span {width}; grid-row: span {height};"
 										title="Mesa {tableInCell.numero} - Arrastra para mover"
 										role="button"
 										tabindex="0"
 									>
-										<div class="text-lg">{tableInCell.numero}</div>
-										<div class="text-xs opacity-90">{tableInCell.capacidad || 4}p</div>
+										<div class="text-2xl font-bold">{tableInCell.numero}</div>
+										<div class="text-sm opacity-90">{tableInCell.capacidad || 4} personas</div>
 										
 										<!-- Indicador de drag -->
 										<div class="absolute bottom-1 left-0 right-0 flex justify-center opacity-50">
