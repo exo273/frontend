@@ -85,8 +85,8 @@
 
 	// Estado del producto
 	function getStockStatus(producto) {
-		const cantidad = producto.cantidad_actual;
-		const minimo = producto.stock_minimo || 0;
+		const cantidad = producto.current_stock || 0;
+		const minimo = producto.low_stock_threshold || 0;
 		
 		if (cantidad <= minimo) return { label: 'Bajo', variant: 'destructive' };
 		if (cantidad <= minimo * 1.5) return { label: 'Medio', variant: 'warning' };
@@ -173,7 +173,13 @@
 	function openEditModal(producto) {
 		modalMode = 'edit';
 		selectedProducto = producto;
-		formData = { ...producto };
+		// Mapear campos del backend al formato del formulario
+		formData = {
+			nombre: producto.name,
+			categoria: producto.category,
+			unidad: producto.inventory_unit,
+			stock_minimo: producto.low_stock_threshold || 0
+		};
 		showModal = true;
 	}
 
@@ -338,10 +344,10 @@
 								{@const status = getStockStatus(producto)}
 								<tr class="border-b border-border hover:bg-accent transition-colors">
 									<td class="py-3 px-4 font-medium">{producto.name}</td>
-									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.category}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.cantidad_actual} {producto.unit}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.stock_minimo || 0} {producto.unit}</td>
-									<td class="py-3 px-4 text-right text-sm">S/ {producto.costo_promedio.toFixed(2)}</td>
+									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.category_name || '-'}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.current_stock} {producto.inventory_unit_abbreviation}</td>
+									<td class="py-3 px-4 text-center text-sm">{producto.low_stock_threshold || 0} {producto.inventory_unit_abbreviation}</td>
+									<td class="py-3 px-4 text-right text-sm">S/ {producto.average_cost?.toFixed(2) || '0.00'}</td>
 									<td class="py-3 px-4 text-center">
 										<Badge variant={status.variant}>{status.label}</Badge>
 									</td>
