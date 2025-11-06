@@ -45,7 +45,8 @@
 		unidad: '',
 		cantidad_actual: 0,
 		stock_minimo: 0,
-		costo_promedio: 0
+		costo_promedio: 0,
+		waste_percentage: null
 	};
 
 	let ajusteData = {
@@ -73,7 +74,7 @@
 		{
 			key: 'costo_promedio',
 			label: 'Costo Prom.',
-			format: (val) => `S/ ${val.toFixed(2)}`,
+			format: (val) => `$ ${val.toFixed(2)}`,
 			align: 'right'
 		},
 		{
@@ -180,7 +181,8 @@
 			unidad: '',
 			cantidad_actual: 0,
 			stock_minimo: 0,
-			costo_promedio: 0
+			costo_promedio: 0,
+			waste_percentage: null
 		};
 		showModal = true;
 	}
@@ -193,7 +195,8 @@
 			nombre: producto.name,
 			categoria: producto.category,
 			unidad: producto.inventory_unit,
-			stock_minimo: producto.low_stock_threshold || 0
+			stock_minimo: producto.low_stock_threshold || 0,
+			waste_percentage: producto.waste_percentage || null
 		};
 		showModal = true;
 	}
@@ -216,7 +219,8 @@
 				description: formData.descripcion || formData.description || '',
 				category: formData.categoria || formData.category,
 				inventory_unit: formData.unidad || formData.inventory_unit,
-				low_stock_threshold: formData.stock_minimo || formData.low_stock_threshold || 0
+				low_stock_threshold: formData.stock_minimo || formData.low_stock_threshold || 0,
+				waste_percentage: formData.waste_percentage || null
 			};
 
 			if (modalMode === 'create') {
@@ -365,7 +369,7 @@
 									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.category_name || '-'}</td>
 									<td class="py-3 px-4 text-center text-sm">{currentStock} {producto.inventory_unit_abbreviation}</td>
 									<td class="py-3 px-4 text-center text-sm">{lowStock} {producto.inventory_unit_abbreviation}</td>
-									<td class="py-3 px-4 text-right text-sm">S/ {avgCost.toFixed(2)}</td>
+									<td class="py-3 px-4 text-right text-sm">$ {avgCost.toFixed(2)}</td>
 									<td class="py-3 px-4 text-center">
 										<Badge variant={status.variant}>{status.label}</Badge>
 									</td>
@@ -445,6 +449,19 @@
 							min="0"
 						/>
 					</div>
+				</div>
+
+				<div class="space-y-2">
+					<label class="text-sm font-medium">Porcentaje de Merma (%)</label>
+					<Input
+						type="number"
+						bind:value={formData.waste_percentage}
+						step="0.01"
+						min="0"
+						max="100"
+						placeholder="Opcional: 0-100%"
+					/>
+					<p class="text-xs text-muted-foreground">Porcentaje de desperdicio o merma del producto</p>
 				</div>
 
 				{#if modalMode === 'create'}
