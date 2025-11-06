@@ -148,6 +148,25 @@
 		formData.detalles = formData.detalles.filter((_, i) => i !== index);
 	}
 
+	function handleProductSelect() {
+		if (!newItem.producto) return;
+
+		// Encontrar el producto seleccionado
+		const productoSeleccionado = productos.find(p => p.id === parseInt(newItem.producto));
+		if (!productoSeleccionado || !productoSeleccionado.categoria) return;
+
+		// Buscar proveedor con la misma categoría
+		const proveedorSugerido = proveedores.find(p => 
+			p.category === productoSeleccionado.categoria && p.is_active
+		);
+
+		// Auto-seleccionar proveedor si existe y no hay uno seleccionado
+		if (proveedorSugerido && !formData.proveedor) {
+			formData.proveedor = proveedorSugerido.id;
+			toast.success(`Proveedor "${proveedorSugerido.name}" seleccionado automáticamente`);
+		}
+	}
+
 	function getTotal() {
 		return formData.detalles.reduce((sum, item) => sum + item.subtotal, 0);
 	}
@@ -301,7 +320,11 @@
 					<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
 		<div class="space-y-2 md:col-span-5">
 			<label class="text-sm font-medium">Producto</label>
-			<select bind:value={newItem.producto} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+			<select 
+				bind:value={newItem.producto} 
+				on:change={handleProductSelect}
+				class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+			>
 				<option value="">Seleccione...</option>
 				{#each productos as producto}
 					<option value={producto.id}>{producto.name} ({producto.unit})</option>
