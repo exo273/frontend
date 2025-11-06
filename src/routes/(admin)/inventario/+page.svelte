@@ -221,14 +221,14 @@
 		try {
 			await apiService.createCategoria({
 				name: categoryFormData.name,
-				description: categoryFormData.description || null
+				description: categoryFormData.description || ''
 			});
 			toast.success('Categoría creada exitosamente');
 			showCategoryModal = false;
 			await loadCategorias();
 		} catch (error) {
 			toast.error('Error al crear categoría');
-			console.error(error);
+			console.error('Error details:', error.response?.data || error);
 		}
 	}
 </script>

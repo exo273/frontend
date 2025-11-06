@@ -197,14 +197,14 @@
 		try {
 			await apiService.createSupplierCategory({
 				name: categoryFormData.name,
-				description: categoryFormData.description || null
+				description: categoryFormData.description || ''
 			});
 			toast.success('Categoría de proveedor creada exitosamente');
 			showCategoryModal = false;
 			await loadSupplierCategories();
 		} catch (error) {
 			toast.error('Error al crear categoría');
-			console.error(error);
+			console.error('Error details:', error.response?.data || error);
 		}
 	}
 </script>

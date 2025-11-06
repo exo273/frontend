@@ -203,14 +203,14 @@
 		try {
 			await apiService.createMenuCategory({
 				nombre: categoryFormData.nombre,
-				descripcion: categoryFormData.descripcion || null
+				descripcion: categoryFormData.descripcion || ''
 			});
 			toast.success('Categoría creada exitosamente');
 			showCategoryModal = false;
 			await loadCategorias();
 		} catch (error) {
 			toast.error('Error al crear categoría');
-			console.error(error);
+			console.error('Error details:', error.response?.data || error);
 		}
 	}
 </script>
