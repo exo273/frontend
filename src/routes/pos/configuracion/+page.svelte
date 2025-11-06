@@ -233,6 +233,11 @@
 			return;
 		}
 
+		// Guardar el ID para verificación posterior
+		const tableId = draggedTable.id;
+		const targetRow = row;
+		const targetCol = col;
+
 		try {
 			const updateData = {
 				numero: draggedTable.numero,
@@ -250,19 +255,22 @@
 			await loadData();
 		} catch (error) {
 			console.error('Error al mover mesa:', error);
-			// Intentar recargar de todos modos por si se guardó
-			try {
-				await loadData();
-				// Si la recarga funciona y la mesa está en la nueva posición, fue exitoso
-				const updatedTable = tables.find(t => t.id === draggedTable.id);
-				if (updatedTable && updatedTable.posicion_x === col && updatedTable.posicion_y === row) {
+			// El backend puede devolver error aunque se guardó (problema de Redis)
+			// Recargar y verificar si realmente se movió
+			await loadData();
+			
+			// Esperar un momento para que tables se actualice
+			setTimeout(() => {
+				const updatedTable = tables.find(t => t.id === tableId);
+				if (updatedTable && updatedTable.posicion_x === targetCol && updatedTable.posicion_y === targetRow) {
+					console.log('✅ Mesa movida exitosamente a pesar del error de backend');
 					toast.success('Mesa reposicionada');
 				} else {
+					console.log('❌ Error real al mover mesa');
 					toast.error('Error al mover mesa');
 				}
-			} catch {
-				toast.error('Error al mover mesa');
-			}
+			}, 100);
+		}
 		}
 
 		isDragging = false;
