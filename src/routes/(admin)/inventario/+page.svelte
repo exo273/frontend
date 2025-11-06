@@ -85,9 +85,10 @@
 
 	// Estado del producto
 	function getStockStatus(producto) {
-		const cantidad = producto.current_stock || 0;
-		const minimo = producto.low_stock_threshold || 0;
+		const cantidad = parseFloat(producto.current_stock) || 0;
+		const minimo = parseFloat(producto.low_stock_threshold) || 0;
 		
+		if (minimo === 0) return { label: 'OK', variant: 'success' };
 		if (cantidad <= minimo) return { label: 'Bajo', variant: 'destructive' };
 		if (cantidad <= minimo * 1.5) return { label: 'Medio', variant: 'warning' };
 		return { label: 'OK', variant: 'success' };
@@ -356,12 +357,15 @@
 						<tbody>
 							{#each productos as producto}
 								{@const status = getStockStatus(producto)}
+								{@const avgCost = typeof producto.average_cost === 'number' ? producto.average_cost : parseFloat(producto.average_cost) || 0}
+								{@const currentStock = typeof producto.current_stock === 'number' ? producto.current_stock : parseFloat(producto.current_stock) || 0}
+								{@const lowStock = typeof producto.low_stock_threshold === 'number' ? producto.low_stock_threshold : parseFloat(producto.low_stock_threshold) || 0}
 								<tr class="border-b border-border hover:bg-accent transition-colors">
 									<td class="py-3 px-4 font-medium">{producto.name}</td>
 									<td class="py-3 px-4 text-sm text-muted-foreground">{producto.category_name || '-'}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.current_stock} {producto.inventory_unit_abbreviation}</td>
-									<td class="py-3 px-4 text-center text-sm">{producto.low_stock_threshold || 0} {producto.inventory_unit_abbreviation}</td>
-									<td class="py-3 px-4 text-right text-sm">S/ {producto.average_cost?.toFixed(2) || '0.00'}</td>
+									<td class="py-3 px-4 text-center text-sm">{currentStock} {producto.inventory_unit_abbreviation}</td>
+									<td class="py-3 px-4 text-center text-sm">{lowStock} {producto.inventory_unit_abbreviation}</td>
+									<td class="py-3 px-4 text-right text-sm">S/ {avgCost.toFixed(2)}</td>
 									<td class="py-3 px-4 text-center">
 										<Badge variant={status.variant}>{status.label}</Badge>
 									</td>
