@@ -118,15 +118,29 @@
 	async function loadProductos() {
 		loading = true;
 		try {
-			const params = { page_size: 1000 };
+			const params = {};
 			if (searchQuery) params.search = searchQuery;
-			if (categoriaFilter) params.categoria = categoriaFilter;
+			if (categoriaFilter) params.category = categoriaFilter;
 
+			console.log('Loading productos with params:', params);
 			const response = await apiService.getProductos(params);
-			productos = response.results || response;
+			console.log('Productos response:', response);
+			
+			// Manejar tanto respuestas paginadas como no paginadas
+			if (Array.isArray(response)) {
+				productos = response;
+			} else if (response.results) {
+				productos = response.results;
+			} else {
+				productos = [];
+			}
+			
+			console.log('Productos cargados:', productos.length, productos);
 		} catch (error) {
 			toast.error('Error al cargar productos');
-			console.error(error);
+			console.error('Error loading productos:', error);
+			console.error('Error details:', error.response?.data || error);
+			productos = [];
 		} finally {
 			loading = false;
 		}
