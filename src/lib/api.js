@@ -205,7 +205,7 @@ export const apiService = {
 	adjustStock: (id, data) => operacionesClient.post(`/api/operaciones/productos/${id}/adjust_stock/`, data),
 
 	// Categorías de Productos (Inventario)
-	getCategorias: () => operacionesClient.get('/api/operaciones/categorias/'),
+	getCategorias: () => operacionesClient.get('/api/operaciones/categorias/?page_size=1000'),
 	createCategoria: (data) => operacionesClient.post('/api/operaciones/categorias/', data),
 	updateCategoria: (id, data) => operacionesClient.patch(`/api/operaciones/categorias/${id}/`, data),
 	deleteCategoria: (id) => operacionesClient.delete(`/api/operaciones/categorias/${id}/`),
@@ -217,7 +217,7 @@ export const apiService = {
 	deleteSupplier: (id) => operacionesClient.delete(`/api/operaciones/proveedores/${id}/`),
 	
 	// Categorías de Proveedores
-	getSupplierCategories: () => operacionesClient.get('/api/operaciones/proveedores/categories/'),
+	getSupplierCategories: () => operacionesClient.get('/api/operaciones/proveedores/categories/?page_size=1000'),
 	createSupplierCategory: (data) => operacionesClient.post('/api/operaciones/proveedores/categories/', data),
 	updateSupplierCategory: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/categories/${id}/`, data),
 	deleteSupplierCategory: (id) => operacionesClient.delete(`/api/operaciones/proveedores/categories/${id}/`),
@@ -233,7 +233,7 @@ export const apiService = {
 	deleteReceta: (id) => operacionesClient.delete(`/api/operaciones/recetas/${id}/`),
 
 	// Menú (POS)
-	getMenuCategories: () => posClient.get('/api/pos/menu/categories/'),
+	getMenuCategories: () => posClient.get('/api/pos/menu/categories/?page_size=1000'),
 	getMenuItems: (params) => posClient.get('/api/pos/menu/items/', params),
 	getMenuItemsAvailable: () => posClient.get('/api/pos/menu/items/available/'),
 	createMenuItem: (data) => posClient.post('/api/pos/menu/items/', data),

@@ -132,9 +132,15 @@
 
 	async function loadCategorias() {
 		try {
-			categorias = await apiService.getCategorias();
+			const response = await apiService.getCategorias();
+			console.log('Categorías response:', response);
+			
+			// Si la respuesta tiene results, usar eso; si no, usar la respuesta directa
+			categorias = response.results || response || [];
+			console.log('Categorías cargadas:', categorias);
 		} catch (error) {
 			console.error('Error al cargar categorías:', error);
+			categorias = [];
 		}
 	}
 
