@@ -31,6 +31,13 @@
 	let modalMode = 'create';
 	let selectedItem = null;
 
+	// Modal de categoría
+	let showCategoryModal = false;
+	let categoryFormData = {
+		nombre: '',
+		descripcion: ''
+	};
+
 	// Form data
 	let formData = {
 		nombre: '',
@@ -180,6 +187,31 @@
 
 	function handleCategoryFilter() {
 		// Filtro reactivo
+	}
+
+	function openCategoryModal() {
+		categoryFormData = { nombre: '', descripcion: '' };
+		showCategoryModal = true;
+	}
+
+	async function handleCategorySubmit() {
+		if (!categoryFormData.nombre.trim()) {
+			toast.error('El nombre de la categoría es requerido');
+			return;
+		}
+
+		try {
+			await apiService.createMenuCategory({
+				nombre: categoryFormData.nombre,
+				descripcion: categoryFormData.descripcion || null
+			});
+			toast.success('Categoría creada exitosamente');
+			showCategoryModal = false;
+			await loadCategorias();
+		} catch (error) {
+			toast.error('Error al crear categoría');
+			console.error(error);
+		}
 	}
 </script>
 
@@ -358,7 +390,17 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div class="space-y-2">
-					<label class="text-sm font-medium">Categoría</label>
+					<div class="flex items-center justify-between">
+						<label class="text-sm font-medium">Categoría</label>
+						<button
+							type="button"
+							on:click={openCategoryModal}
+							class="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+						>
+							<Plus class="h-3 w-3" />
+							Nueva
+						</button>
+					</div>
 					<select 
 						bind:value={formData.categoria} 
 						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -439,3 +481,40 @@
 	</div>
 </Dialog>
 
+<!-- Modal para crear categoría -->
+<Dialog bind:open={showCategoryModal} title="Nueva Categoría">
+	<div class="space-y-4">
+		<form on:submit|preventDefault={handleCategorySubmit} class="space-y-4">
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Nombre de la Categoría *</label>
+				<Input
+					type="text"
+					bind:value={categoryFormData.nombre}
+					required
+					placeholder="Ej: Entradas, Platos de Fondo, Bebidas..."
+					autofocus
+				/>
+			</div>
+
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Descripción</label>
+				<textarea
+					bind:value={categoryFormData.descripcion}
+					rows="2"
+					class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					placeholder="Descripción opcional de la categoría..."
+				/>
+			</div>
+		</form>
+
+		<!-- Footer -->
+		<div class="flex justify-end gap-2 pt-4">
+			<Button variant="ghost" on:click={() => (showCategoryModal = false)}>
+				Cancelar
+			</Button>
+			<Button on:click={handleCategorySubmit}>
+				Crear Categoría
+			</Button>
+		</div>
+	</div>
+</Dialog>
