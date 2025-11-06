@@ -204,15 +204,23 @@ export const apiService = {
 	deleteProducto: (id) => operacionesClient.delete(`/api/operaciones/productos/${id}/`),
 	adjustStock: (id, data) => operacionesClient.post(`/api/operaciones/productos/${id}/adjust_stock/`, data),
 
-	// Categorías
+	// Categorías de Productos (Inventario)
 	getCategorias: () => operacionesClient.get('/api/operaciones/categorias/'),
 	createCategoria: (data) => operacionesClient.post('/api/operaciones/categorias/', data),
+	updateCategoria: (id, data) => operacionesClient.patch(`/api/operaciones/categorias/${id}/`, data),
+	deleteCategoria: (id) => operacionesClient.delete(`/api/operaciones/categorias/${id}/`),
 
 	// Proveedores
 	getSuppliers: () => operacionesClient.get('/api/operaciones/proveedores/'),
 	createSupplier: (data) => operacionesClient.post('/api/operaciones/proveedores/', data),
 	updateSupplier: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/${id}/`, data),
 	deleteSupplier: (id) => operacionesClient.delete(`/api/operaciones/proveedores/${id}/`),
+	
+	// Categorías de Proveedores
+	getSupplierCategories: () => operacionesClient.get('/api/operaciones/proveedores/categories/'),
+	createSupplierCategory: (data) => operacionesClient.post('/api/operaciones/proveedores/categories/', data),
+	updateSupplierCategory: (id, data) => operacionesClient.patch(`/api/operaciones/proveedores/categories/${id}/`, data),
+	deleteSupplierCategory: (id) => operacionesClient.delete(`/api/operaciones/proveedores/categories/${id}/`),
 
 	// Compras
 	getPurchases: (params) => operacionesClient.get('/api/operaciones/compras/', params),

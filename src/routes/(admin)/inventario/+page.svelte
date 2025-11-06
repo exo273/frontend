@@ -27,8 +27,15 @@
 	// Modal states
 	let showModal = false;
 	let showAjusteModal = false;
+	let showCategoryModal = false;
 	let modalMode = 'create'; // 'create' o 'edit'
 	let selectedProducto = null;
+
+	// Form data para categoría
+	let categoryFormData = {
+		name: '',
+		description: ''
+	};
 
 	// Form data
 	let formData = {
@@ -199,6 +206,31 @@
 		searchQuery = query;
 		loadProductos();
 	}
+
+	function openCategoryModal() {
+		categoryFormData = { name: '', description: '' };
+		showCategoryModal = true;
+	}
+
+	async function handleCategorySubmit() {
+		if (!categoryFormData.name.trim()) {
+			toast.error('El nombre de la categoría es requerido');
+			return;
+		}
+
+		try {
+			await apiService.createCategoria({
+				name: categoryFormData.name,
+				description: categoryFormData.description || null
+			});
+			toast.success('Categoría creada exitosamente');
+			showCategoryModal = false;
+			await loadCategorias();
+		} catch (error) {
+			toast.error('Error al crear categoría');
+			console.error(error);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -324,14 +356,24 @@
 				</div>
 
 				<div class="space-y-2">
-				<label class="text-sm font-medium">Categoría *</label>
-				<select bind:value={formData.categoria} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-					<option value="">Seleccione una categoría</option>
-					{#each categorias as categoria}
-						<option value={categoria.id}>{categoria.name}</option>
-					{/each}
-				</select>
-			</div>				<div class="grid grid-cols-2 gap-4">
+					<div class="flex items-center justify-between">
+						<label class="text-sm font-medium">Categoría *</label>
+						<button
+							type="button"
+							on:click={openCategoryModal}
+							class="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+						>
+							<Plus class="h-3 w-3" />
+							Nueva
+						</button>
+					</div>
+					<select bind:value={formData.categoria} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+						<option value="">Seleccione una categoría</option>
+						{#each categorias as categoria}
+							<option value={categoria.id}>{categoria.name}</option>
+						{/each}
+					</select>
+				</div>				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
 						<label class="text-sm font-medium">Unidad *</label>
 						<select bind:value={formData.unidad} required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
@@ -391,6 +433,44 @@
 		</div>
 	</Dialog>
 {/if}
+
+<!-- Modal para crear categoría de producto -->
+<Dialog bind:open={showCategoryModal} title="Nueva Categoría de Producto">
+	<div class="space-y-4">
+		<form on:submit|preventDefault={handleCategorySubmit} class="space-y-4">
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Nombre de la Categoría *</label>
+				<Input
+					type="text"
+					bind:value={categoryFormData.name}
+					required
+					placeholder="Ej: Abarrotes, Verduras, Carnes, Lácteos..."
+					autofocus
+				/>
+			</div>
+
+			<div class="space-y-2">
+				<label class="text-sm font-medium">Descripción</label>
+				<textarea
+					bind:value={categoryFormData.description}
+					rows="2"
+					class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					placeholder="Descripción opcional de la categoría..."
+				/>
+			</div>
+		</form>
+
+		<!-- Footer -->
+		<div class="flex justify-end gap-2 pt-4">
+			<Button variant="ghost" on:click={() => (showCategoryModal = false)}>
+				Cancelar
+			</Button>
+			<Button on:click={handleCategorySubmit}>
+				Crear Categoría
+			</Button>
+		</div>
+	</div>
+</Dialog>
 
 <!-- Modal Ajustar Stock -->
 {#if showAjusteModal}

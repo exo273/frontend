@@ -17,16 +17,25 @@
 	let proveedores = [];
 	let loading = false;
 	let searchQuery = '';
+	let supplierCategories = [];
 
 	// Modal state
 	let showModal = false;
+	let showCategoryModal = false;
 	let modalMode = 'create';
 	let selectedProveedor = null;
+
+	// Form data para categor√≠a
+	let categoryFormData = {
+		name: '',
+		description: ''
+	};
 
 	// Form data
 	let formData = {
 		name: '',
 		rut: '',
+		category: '',
 		address: '',
 		city: '',
 		region: '',
@@ -69,7 +78,7 @@
 	];
 
 	onMount(async () => {
-		await loadProveedores();
+		await Promise.all([loadProveedores(), loadSupplierCategories()]);
 	});
 
 	async function loadProveedores() {
@@ -88,11 +97,21 @@
 		}
 	}
 
+	async function loadSupplierCategories() {
+		try {
+			supplierCategories = await apiService.getSupplierCategories();
+		} catch (error) {
+			console.error('Error al cargar categor√≠as de proveedores:', error);
+			supplierCategories = [];
+		}
+	}
+
 	function openCreateModal() {
 		modalMode = 'create';
 		formData = {
 			name: '',
 			rut: '',
+			category: '',
 			address: '',
 			city: '',
 			region: '',
@@ -156,6 +175,31 @@
 	function handleSearch(query) {
 		searchQuery = query;
 		loadProveedores();
+	}
+
+	function openCategoryModal() {
+		categoryFormData = { name: '', description: '' };
+		showCategoryModal = true;
+	}
+
+	async function handleCategorySubmit() {
+		if (!categoryFormData.name.trim()) {
+			toast.error('El nombre de la categor√≠a es requerido');
+			return;
+		}
+
+		try {
+			await apiService.createSupplierCategory({
+				name: categoryFormData.name,
+				description: categoryFormData.description || null
+			});
+			toast.success('Categor√≠a de proveedor creada exitosamente');
+			showCategoryModal = false;
+			await loadSupplierCategories();
+		} catch (error) {
+			toast.error('Error al crear categor√≠a');
+			console.error(error);
+		}
 	}
 </script>
 
@@ -281,10 +325,32 @@
 						<Input
 							bind:value={formData.rut}
 							required
-							maxlength="12"
 							placeholder="12.345.678-9"
 						/>
 					</div>
+				</div>
+
+				<div class="space-y-2">
+					<div class="flex items-center justify-between">
+						<label class="text-sm font-medium">Categor√≠a</label>
+						<button
+							type="button"
+							on:click={openCategoryModal}
+							class="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+						>
+							<Plus class="h-3 w-3" />
+							Nueva
+						</button>
+					</div>
+					<select 
+						bind:value={formData.category} 
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+					>
+						<option value="">Sin categor√≠a</option>
+						{#each supplierCategories as category}
+							<option value={category.id}>{category.name}</option>
+						{/each}
+					</select>
 				</div>
 
 				<div class="space-y-2">
@@ -376,3 +442,40 @@
 		</div>
 	</Dialog>
 {/if}
+<!-- Modal para crear categorÌa de proveedor -->
+<Dialog bind:open={showCategoryModal} title="Nueva CategorÌa de Proveedor">
+<div class="space-y-4">
+<form on:submit|preventDefault={handleCategorySubmit} class="space-y-4">
+<div class="space-y-2">
+<label class="text-sm font-medium">Nombre de la CategorÌa *</label>
+<Input
+type="text"
+bind:value={categoryFormData.name}
+required
+placeholder="Ej: Proveedor de Carnes, Proveedor de Abarrotes..."
+autofocus
+/>
+</div>
+
+<div class="space-y-2">
+<label class="text-sm font-medium">DescripciÛn</label>
+<textarea
+bind:value={categoryFormData.description}
+rows="2"
+class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+placeholder="DescripciÛn opcional de la categorÌa..."
+/>
+</div>
+</form>
+
+<!-- Footer -->
+<div class="flex justify-end gap-2 pt-4">
+<Button variant="ghost" on:click={() => (showCategoryModal = false)}>
+Cancelar
+</Button>
+<Button on:click={handleCategorySubmit}>
+Crear CategorÌa
+</Button>
+</div>
+</div>
+</Dialog>
