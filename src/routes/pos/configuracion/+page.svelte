@@ -419,9 +419,9 @@
 
 			<!-- Canvas de mesas con cuadrícula -->
 			<div class="flex-1 overflow-auto p-6 bg-muted/30">
-				<div class="inline-block bg-background rounded-lg border border-border p-2">
+				<div class="inline-block bg-background rounded-lg border border-border p-4">
 					<!-- Grid de celdas -->
-					<div class="grid gap-2" style="grid-template-columns: repeat({GRID_COLS}, {CELL_SIZE}px);">
+					<div class="grid gap-4" style="grid-template-columns: repeat({GRID_COLS}, {CELL_SIZE}px);">
 						{#each Array(GRID_ROWS) as _, row}
 							{#each Array(GRID_COLS) as _, col}
 								{@const tableInCell = isTableInCell(row, col, zoneTables)}
@@ -431,13 +431,14 @@
 									<!-- Celda con mesa (origen) - ARRASTRABLE -->
 									{@const width = (tableInCell.ancho || 1)}
 									{@const height = (tableInCell.alto || 1)}
+									{@const gapSize = 16} <!-- gap-4 = 16px -->
 									<div
 										draggable="true"
 										on:dragstart={(e) => handleTableDragStart(e, tableInCell)}
 										on:dragend={handleTableDragEnd}
 										on:click={() => handleCellClick(row, col)}
-										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-sm group relative cursor-move {isDragging && draggedTable?.id === tableInCell.id ? 'opacity-50' : ''}"
-										style="width: {width * CELL_SIZE + (width - 1) * 8}px; height: {height * CELL_SIZE + (height - 1) * 8}px; grid-column: span {width}; grid-row: span {height};"
+										class="bg-primary hover:bg-primary/90 border-2 border-primary text-primary-foreground rounded-lg flex flex-col items-center justify-center font-bold transition-all hover:scale-105 shadow-md group relative cursor-move {isDragging && draggedTable?.id === tableInCell.id ? 'opacity-50' : ''}"
+										style="width: {width * CELL_SIZE + (width - 1) * gapSize}px; height: {height * CELL_SIZE + (height - 1) * gapSize}px; grid-column: span {width}; grid-row: span {height};"
 										title="Mesa {tableInCell.numero} - Arrastra para mover"
 										role="button"
 										tabindex="0"

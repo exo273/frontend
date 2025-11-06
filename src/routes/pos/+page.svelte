@@ -71,12 +71,13 @@
 
 	function getTablePosition(table) {
 		const CELL_SIZE = 80; // Mismo tamaño que en configuración
-		const x = (table.posicion_x ?? 0) * CELL_SIZE;
-		const y = (table.posicion_y ?? 0) * CELL_SIZE;
+		const GAP_SIZE = 16; // gap-4 = 16px para coincidir con configuración
+		const x = (table.posicion_x ?? 0) * (CELL_SIZE + GAP_SIZE);
+		const y = (table.posicion_y ?? 0) * (CELL_SIZE + GAP_SIZE);
 		const cellWidth = table.ancho || 1;
 		const cellHeight = table.alto || 1;
-		const width = cellWidth * CELL_SIZE;
-		const height = cellHeight * CELL_SIZE;
+		const width = cellWidth * CELL_SIZE + (cellWidth - 1) * GAP_SIZE;
+		const height = cellHeight * CELL_SIZE + (cellHeight - 1) * GAP_SIZE;
 		const shape = table.forma || 'cuadrada';
 		return { x, y, width, height, shape };
 	}
@@ -198,26 +199,26 @@
 							</div>
 						</div>
 					{:else}
-						<div class="relative" style="min-height: 600px; min-width: 1000px;">
+						<div class="relative p-8" style="min-height: 600px; min-width: 1000px;">
 							{#each zoneTables as table}
 								{@const pos = getTablePosition(table)}
 								{@const statusClass = getTableClass(table)}
 								<button
 									on:click={() => selectTable(table)}
-									class="absolute flex flex-col items-center justify-center font-bold text-white shadow-lg transition-all hover:scale-105 border-4 {statusClass === 'selected'
-										? 'bg-yellow-500 border-yellow-600'
+									class="absolute flex flex-col items-center justify-center font-bold shadow-lg transition-all hover:scale-105 border-4 rounded-lg {statusClass === 'selected'
+										? 'bg-yellow-500 border-yellow-600 text-yellow-950'
 										: statusClass === 'occupied'
-											? 'bg-destructive border-destructive'
+											? 'bg-destructive border-destructive text-destructive-foreground'
 											: statusClass === 'reserved'
-												? 'bg-blue-500 border-blue-600'
-												: 'bg-primary border-primary'}"
+												? 'bg-blue-500 border-blue-600 text-blue-950'
+												: 'bg-primary border-primary text-primary-foreground'}"
 									style="left: {pos.x}px; top: {pos.y}px; width: {pos.width}px; height: {pos.height}px; {pos.shape ===
 									'redonda'
 										? 'border-radius: 50%;'
-										: 'border-radius: 0.5rem;'}"
+										: ''}"
 								>
-									<span class="text-3xl font-bold drop-shadow-lg">{table.numero}</span>
-									<span class="text-xs opacity-90">{table.capacidad || 4}p</span>
+									<span class="text-3xl font-bold">{table.numero}</span>
+									<span class="text-xs opacity-75">{table.capacidad || 4}p</span>
 								</button>
 							{/each}
 						</div>
